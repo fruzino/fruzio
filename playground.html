@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google-adsense-account" content="ca-pub-4768903876434099">
+<title>Mint | Playground</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g:#7bda6a;--g2:#4ea843;--g3:#2a4e1f;
+  --gg:rgba(123,218,106,0.18);--gg2:rgba(123,218,106,0.07);
+  --bg:#0e1010;--bg2:#141716;--bg3:#191d19;--bg4:#1e2520;
+  --b1:rgba(123,218,106,0.13);--b2:rgba(255,255,255,0.06);--b3:rgba(255,255,255,0.03);
+  --tx:#d4e8d0;--dm:#4e6549;--dm2:#3a4e36;
+  --teal:#4ec9b0;--or:#ce9178;--bl:#6ab0f5;--yw:#d8b52a;--red:#f44747;
+  --err:#ff5f57;--warn:#febc2e;--ok:#28c840;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);display:flex;flex-direction:column}
+
+/* HEADER */
+header{
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;height:52px;
+  background:rgba(14,16,16,.96);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--b1);z-index:100;
+}
+.logo-wrap{display:flex;flex-direction:column;text-decoration:none}
+.logo-sub{font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--dm)}
+.logo-main{display:flex;align-items:center;gap:6px}
+.logo-main span{font-family:'DM Serif Display',serif;font-size:22px;color:#fff;line-height:1}
+.logo-main img{height:20px}
+.header-center{display:flex;align-items:center;gap:6px}
+.pg-badge{
+  font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--g);
+  background:var(--gg2);border:1px solid var(--b1);border-radius:20px;
+  padding:3px 12px;letter-spacing:.06em;
+  display:flex;align-items:center;gap:6px;
+}
+.pg-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--g);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.header-right{display:flex;align-items:center;gap:8px}
+.hbtn{
+  font-family:'DM Sans',sans-serif;font-size:12px;
+  background:transparent;border:1px solid var(--b2);color:var(--dm);
+  padding:5px 12px;border-radius:6px;cursor:pointer;
+  text-decoration:none;display:flex;align-items:center;gap:5px;
+  transition:border-color .15s,color .15s,background .15s;
+}
+.hbtn:hover{border-color:var(--b1);color:var(--tx);background:var(--gg2)}
+.hbtn.run{background:var(--g);color:#0c180a;border-color:var(--g);font-weight:700;font-size:13px;padding:6px 18px}
+.hbtn.run:hover{background:#90ee80}
+.hbtn.run:active{transform:scale(.96)}
+
+/* MAIN LAYOUT */
+.workspace{
+  flex:1;display:grid;
+  grid-template-columns:220px 1fr 340px;
+  grid-template-rows:1fr;
+  overflow:hidden;
+  min-height:0;
+}
+
+/* SIDEBAR — examples */
+.sidebar{
+  background:var(--bg2);border-right:1px solid var(--b1);
+  display:flex;flex-direction:column;overflow:hidden;
+  animation:slideInLeft .4s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes slideInLeft{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:translateX(0)}}
+.sidebar-title{
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  color:var(--dm);letter-spacing:.16em;text-transform:uppercase;
+  padding:14px 14px 8px;border-bottom:1px solid var(--b2);flex-shrink:0;
+}
+.example-list{overflow-y:auto;flex:1;padding:6px}
+.example-list::-webkit-scrollbar{width:3px}
+.example-list::-webkit-scrollbar-thumb{background:var(--b1);border-radius:4px}
+.ex-item{
+  padding:10px 10px;border-radius:7px;cursor:pointer;
+  border:1px solid transparent;margin-bottom:2px;
+  transition:background .15s,border-color .15s;
+}
+.ex-item:hover{background:var(--bg3);border-color:var(--b2)}
+.ex-item.active{background:var(--bg4);border-color:var(--b1)}
+.ex-name{font-size:12px;color:var(--tx);font-weight:500;margin-bottom:2px}
+.ex-desc{font-size:10px;color:var(--dm);line-height:1.4}
+.ex-tag{
+  display:inline-block;font-size:9px;font-family:'JetBrains Mono',monospace;
+  padding:1px 6px;border-radius:3px;margin-top:4px;
+}
+.tag-basic{background:rgba(123,218,106,.08);color:var(--g);border:1px solid var(--b1)}
+.tag-ai{background:rgba(110,160,245,.08);color:var(--bl);border:1px solid rgba(110,160,245,.15)}
+.tag-list{background:rgba(78,201,176,.08);color:var(--teal);border:1px solid rgba(78,201,176,.15)}
+.tag-browser{background:rgba(216,181,42,.08);color:var(--yw);border:1px solid rgba(216,181,42,.15)}
+
+/* EDITOR PANE */
+.editor-pane{
+  display:flex;flex-direction:column;overflow:hidden;position:relative;
+  animation:fadeUp .5s cubic-bezier(.16,1,.3,1) .1s both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.editor-tabs{
+  display:flex;align-items:center;gap:0;
+  background:var(--bg2);border-bottom:1px solid var(--b1);flex-shrink:0;padding:0 12px;
+}
+.tab{
+  font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dm);
+  padding:10px 16px;cursor:pointer;border-bottom:2px solid transparent;
+  transition:color .15s,border-color .15s;white-space:nowrap;
+}
+.tab.active{color:var(--g);border-bottom-color:var(--g)}
+.tab:hover:not(.active){color:var(--tx)}
+
+/* editor container */
+.editor-container{flex:1;position:relative;overflow:hidden;display:flex}
+.line-nums{
+  width:46px;flex-shrink:0;
+  background:var(--bg);
+  padding:16px 0;
+  text-align:right;
+  font-family:'JetBrains Mono',monospace;font-size:13px;
+  color:var(--dm2);line-height:1.7;
+  user-select:none;border-right:1px solid var(--b2);
+  overflow:hidden;
+}
+.line-nums span{display:block;padding-right:10px;transition:color .1s}
+.line-nums span.hl{color:var(--dm)}
+
+/* the actual textarea */
+#editor{
+  flex:1;
+  background:transparent;
+  color:rgba(212,232,208,0.0);caret-color:var(--g);
+  font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7;
+  padding:16px 16px;
+  border:none;outline:none;resize:none;
+  white-space:pre;overflow:auto;
+  position:absolute;inset:0 0 0 46px;
+  z-index:2;
+  tab-size:4;
+  -webkit-text-fill-color:rgba(212,232,208,0.0);
+}
+#editor::selection{background:rgba(123,218,106,.22)}
+/* highlight layer */
+#highlight{
+  position:absolute;inset:0 0 0 46px;
+  pointer-events:none;z-index:1;
+  font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7;
+  padding:16px 16px;
+  white-space:pre;overflow:hidden;
+  background:var(--bg);
+  color:var(--tx);
+  word-break:normal;word-wrap:normal;
+}
+/* current line highlight */
+.cur-line{background:rgba(123,218,106,.04);display:block;width:100%}
+
+/* status bar */
+.status-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:4px 14px;background:var(--bg2);border-top:1px solid var(--b2);
+  font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dm);flex-shrink:0;
+}
+.sb-left,.sb-right{display:flex;align-items:center;gap:14px}
+.sb-item{display:flex;align-items:center;gap:5px}
+.sb-dot{width:6px;height:6px;border-radius:50%;background:var(--ok)}
+
+/* OUTPUT PANE */
+.output-pane{
+  background:var(--bg2);border-left:1px solid var(--b1);
+  display:flex;flex-direction:column;overflow:hidden;
+  animation:slideInRight .4s cubic-bezier(.16,1,.3,1) .15s both;
+}
+@keyframes slideInRight{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+.output-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--b2);flex-shrink:0;
+}
+.out-title{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dm);letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:7px}
+.out-indicator{width:6px;height:6px;border-radius:50%;background:var(--dm2);transition:background .3s}
+.out-indicator.running{background:var(--yw);animation:runPulse .6s ease-in-out infinite}
+.out-indicator.done{background:var(--ok)}
+.out-indicator.err{background:var(--err)}
+@keyframes runPulse{0%,100%{opacity:1}50%{opacity:.3}}
+.out-clear{background:none;border:none;color:var(--dm);cursor:pointer;font-size:11px;font-family:'DM Sans',sans-serif;padding:2px 7px;border-radius:4px;transition:color .15s,background .15s}
+.out-clear:hover{color:var(--tx);background:var(--b2)}
+
+#output{
+  flex:1;overflow-y:auto;
+  padding:14px;
+  font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.75;
+  scrollbar-width:thin;scrollbar-color:var(--b1) transparent;
+}
+#output::-webkit-scrollbar{width:3px}
+#output::-webkit-scrollbar-thumb{background:var(--b1);border-radius:4px}
+
+.out-line{
+  display:flex;gap:8px;margin-bottom:2px;
+  animation:lineIn .18s ease-out both;
+}
+@keyframes lineIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
+.out-prompt{color:var(--dm);flex-shrink:0;user-select:none}
+.out-text{color:var(--tx);word-break:break-all}
+.out-text.green{color:var(--g)}
+.out-text.teal{color:var(--teal)}
+.out-text.orange{color:var(--or)}
+.out-text.blue{color:var(--bl)}
+.out-text.yellow{color:var(--yw)}
+.out-text.red{color:#f47474}
+.out-text.dim{color:var(--dm)}
+.out-text.bold{font-weight:700}
+.out-sep{border:none;border-top:1px solid var(--b2);margin:8px 0}
+.out-empty{color:var(--dm2);font-style:italic;font-size:12px;text-align:center;margin-top:40px}
+
+/* input prompt in output */
+.out-input-wrap{display:flex;align-items:center;gap:8px;margin-top:4px;padding:8px;background:var(--bg3);border-radius:6px;border:1px solid var(--b1)}
+.out-input{background:none;border:none;outline:none;color:var(--g);font-family:'JetBrains Mono',monospace;font-size:12.5px;flex:1;caret-color:var(--g)}
+
+/* info panel below output */
+.info-panel{
+  border-top:1px solid var(--b2);padding:10px 14px;flex-shrink:0;
+  background:var(--bg3);
+}
+.info-title{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--dm);letter-spacing:.12em;text-transform:uppercase;margin-bottom:7px}
+.var-list{display:flex;flex-direction:column;gap:3px;max-height:100px;overflow-y:auto}
+.var-list::-webkit-scrollbar{width:2px}
+.var-list::-webkit-scrollbar-thumb{background:var(--b1)}
+.var-row{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:11px;animation:lineIn .2s ease-out both}
+.var-name{color:var(--g);flex-shrink:0}
+.var-eq{color:var(--dm)}
+.var-val{color:var(--or);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* syntax colors in highlight div */
+.s-comment{color:#4a6044;font-style:italic}
+.s-kw{color:var(--teal);font-weight:600}
+.s-fn{color:var(--teal)}
+.s-str{color:#9dce85}
+.s-var{color:var(--g)}
+.s-num{color:#b5cea8}
+.s-op{color:var(--or)}
+.s-paren{color:#da9966}
+.s-special{color:var(--bl)}
+
+/* run shimmer on button */
+.hbtn.run.loading{animation:btnShimmer 1s linear infinite}
+@keyframes btnShimmer{0%{box-shadow:0 0 0 0 rgba(123,218,106,.4)}50%{box-shadow:0 0 14px 4px rgba(123,218,106,.25)}100%{box-shadow:0 0 0 0 rgba(123,218,106,.4)}}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo-wrap">
+    <span class="logo-sub">Fruzio</span>
+    <div class="logo-main"><span>Mint</span><img src="Mint.png" alt=""></div>
+  </a>
+  <div class="header-center">
+    <div class="pg-badge">Playground</div>
+  </div>
+  <div class="header-right">
+    <button class="hbtn" id="btn-share" title="Copy script link">&#128279; Share</button>
+    <button class="hbtn" id="btn-clear-editor">&#128465; Clear</button>
+    <a href="commands.html" class="hbtn" target="_blank">&#128214; Commands</a>
+    <button class="hbtn run" id="btn-run">&#9654; Run</button>
+  </div>
+</header>
+
+<div class="workspace">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-title">Examples</div>
+    <div class="example-list" id="example-list"></div>
+  </aside>
+
+  <!-- EDITOR -->
+  <div class="editor-pane">
+    <div class="editor-tabs">
+      <div class="tab active">script.mint</div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px;padding-right:4px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dm)" id="char-count">0 chars</span>
+      </div>
+    </div>
+    <div class="editor-container">
+      <div class="line-nums" id="line-nums"><span>1</span></div>
+      <div id="highlight" aria-hidden="true"></div>
+      <textarea id="editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="# Write your Mint script here..."></textarea>
+    </div>
+    <div class="status-bar">
+      <div class="sb-left">
+        <div class="sb-item"><div class="sb-dot" id="sb-dot"></div><span id="sb-status">Ready</span></div>
+        <div class="sb-item" id="sb-pos">Ln 1, Col 1</div>
+      </div>
+      <div class="sb-right">
+        <div class="sb-item">Mint 1.4.0-beta</div>
+        <div class="sb-item">UTF-8</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OUTPUT -->
+  <div class="output-pane">
+    <div class="output-header">
+      <div class="out-title">
+        <div class="out-indicator" id="out-ind"></div>
+        Output
+      </div>
+      <button class="out-clear" id="btn-clear-out">Clear</button>
+    </div>
+    <div id="output">
+      <div class="out-empty" id="out-empty">Run a script to see output here<br><span style="font-size:10px;opacity:.5">Ctrl+Enter to run</span></div>
+    </div>
+    <div class="info-panel">
+      <div class="info-title">Variables</div>
+      <div class="var-list" id="var-list">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dm2);font-style:italic">No variables yet</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── EXAMPLES ──
+const EXAMPLES = [
+  {
+    name:'Hello World',desc:'Basic output & variables',tag:'basic',tagClass:'tag-basic',
+    code:`# Hello World in Mint
+name = Alice
+age = 22
+
+write(Hello, @name!)
+write(You are @age years old.)
+write(Welcome to Mint.)`
+  },
+  {
+    name:'Calc & Math',desc:'Variables and arithmetic',tag:'basic',tagClass:'tag-basic',
+    code:`# Math operations
+x = 10
+y = 3
+
+@sum = calc(@x + @y)
+@diff = calc(@x - @y)
+@prod = calc(@x * @y)
+@quot = calc(@x / @y)
+@power = calc(pow(@x, 2))
+@root = calc(sqrt(@x))
+
+write(Sum: @sum)
+write(Difference: @diff)
+write(Product: @prod)
+write(Quotient: @quot)
+write(x squared: @power)
+write(sqrt(x): @root)`
+  },
+  {
+    name:'If / Logic',desc:'Conditionals with and/or',tag:'basic',tagClass:'tag-basic',
+    code:`# Conditional logic
+score = 85
+passed = true
+
+if(@score > 50, {
+    write(Score is passing!)
+})
+
+if(@passed == true, {
+    write(You passed the test.)
+})
+
+if(@score > 90, {
+    write(Excellent!)
+}, {
+    write(Good effort.)
+})`
+  },
+  {
+    name:'Loops',desc:'repeat and while loops',tag:'basic',tagClass:'tag-basic',
+    code:`# Loops in Mint
+write(--- repeat 3 times ---)
+repeat(3, {
+    write(Hello!)
+})
+
+write(--- while loop ---)
+@i = 0
+while(@i < 5, {
+    write(i = @i)
+    @i = calc(@i + 1)
+})`
+  },
+  {
+    name:'Functions',desc:'Define and call functions',tag:'basic',tagClass:'tag-basic',
+    code:`# Functions
+func greet {
+    write(Hello from greet function!)
+    write(Today is a good day.)
+}
+
+func farewell {
+    write(Goodbye! Come back soon.)
+}
+
+write(Calling greet:)
+call greet
+
+write(Calling farewell:)
+call farewell`
+  },
+  {
+    name:'Lists',desc:'Full list data structure',tag:'list',tagClass:'tag-list',
+    code:`# List operations
+list.new(fruits)
+list.add(fruits, apple)
+list.add(fruits, banana)
+list.add(fruits, cherry)
+list.add(fruits, date)
+
+write(--- All fruits ---)
+list.print(fruits)
+
+list.len(fruits)
+write(Count: @_)
+
+list.get(fruits, 1)
+write(Item at index 1: @_)
+
+list.contains(fruits, banana)
+write(Has banana: @_)
+
+list.reverse(fruits)
+write(--- Reversed ---)
+list.print(fruits)
+
+list.join(fruits, , )
+write(Joined: @_)`
+  },
+  {
+    name:'String Tools',desc:'strtools plugin commands',tag:'list',tagClass:'tag-list',
+    code:`# String manipulation (strtools plugin)
+upper(hello world)
+write(Upper: @_)
+
+lower(MINT IS GREAT)
+write(Lower: @_)
+
+length(Hello Mint)
+write(Length: @_)
+
+reverse(abcdef)
+write(Reversed: @_)
+
+replace(I love Python, Python, Mint)
+write(Replaced: @_)
+
+contains(Mint is cool, cool)
+write(Contains cool: @_)
+
+trim(   padded text   )
+write(Trimmed: "@_")`
+  },
+  {
+    name:'AI Prompt',desc:'Using tinyai for offline LLM',tag:'ai',tagClass:'tag-ai',
+    code:`# AI with tinyai (offline LLM)
+# Note: requires a model file in the Mint folder
+
+topic = the history of the internet
+
+write(Asking AI about: @topic)
+tinyai(Give a 2-sentence summary of @topic, reply, .default, .default)
+write(AI says: @reply)
+
+# Chained AI calls
+tinyai(Turn this into a haiku: @reply, haiku, .default, .default)
+write(Haiku version:)
+write(@haiku)`
+  },
+  {
+    name:'Browser Auto',desc:'Drive Chrome with Selenium',tag:'browser',tagClass:'tag-browser',
+    code:`# Browser automation
+# Requires: pip install selenium + ChromeDriver
+
+write(Opening browser...)
+browser(chrome)
+website(https://example.com)
+
+wait(2000)
+
+write(Reading page title...)
+gettext(TAG, h1, 5, title)
+write(Page says: @title)
+
+write(Navigating to another page...)
+website(https://example.com/about)
+
+wait(1000)
+browser.quit()
+write(Done!)`
+  },
+];
+
+// ── RENDER SIDEBAR ──
+const exList = document.getElementById('example-list');
+EXAMPLES.forEach((ex,i)=>{
+  const d=document.createElement('div');
+  d.className='ex-item'+(i===0?' active':'');
+  d.innerHTML=`<div class="ex-name">${ex.name}</div><div class="ex-desc">${ex.desc}</div><span class="ex-tag ${ex.tagClass}">${ex.tag}</span>`;
+  d.addEventListener('click',()=>{
+    document.querySelectorAll('.ex-item').forEach(e=>e.classList.remove('active'));
+    d.classList.add('active');
+    setCode(ex.code);
+  });
+  exList.appendChild(d);
+});
+
+// ── EDITOR ──
+const editor = document.getElementById('editor');
+const highlight = document.getElementById('highlight');
+const lineNums = document.getElementById('line-nums');
+const charCount = document.getElementById('char-count');
+const sbPos = document.getElementById('sb-pos');
+
+// Syntax highlighting — must be declared before setCode is called
+const KW = ['if','while','repeat','func','call','wait','exit','clear','edit','delete','show','locate'];
+const FN = ['write','input','calc','sys','run','file','ai','llm','tinyai','ai.clear',
+            'browser','website','click','type','gettext','browser.quit',
+            'playsound','stopsound','video','vstop','vvolume','vseek','vlength','image',
+            'dialog','list.new','list.add','list.get','list.set','list.remove','list.pop',
+            'list.len','list.clear','list.delete','list.print','list.contains','list.indexof',
+            'list.join','list.reverse',
+            'upper','lower','reverse','length','replace','contains','trim','repeat_str'];
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function setCode(code){
+  editor.value = code;
+  updateHighlight();
+  updateLineNums();
+}
+
+// Load first example
+setCode(EXAMPLES[0].code);
+
+// Build sorted FN set for O(1) lookup
+const FN_SET = new Set(FN);
+const KW_SET = new Set(KW);
+
+function syntaxHL(code){
+  try {
+    return code.split('\n').map(line => hlLine(line)).join('\n');
+  } catch(e) {
+    // fallback: plain escaped text so editor is never blank
+    return escHtml(code);
+  }
+}
+
+function hlLine(line){
+  // full-line comment
+  if(/^\s*#/.test(line)){
+    return `<span class="s-comment">${escHtml(line)}</span>`;
+  }
+
+  // tokenise character by character into segments
+  const tokens = [];
+  let i = 0;
+  while(i < line.length){
+    // @variable
+    if(line[i]==='@'){
+      let j=i+1;
+      while(j<line.length && /[\w_]/.test(line[j])) j++;
+      tokens.push({t:'var', v:line.slice(i,j)});
+      i=j; continue;
+    }
+    // quoted string
+    if(line[i]==='"'){
+      let j=i+1;
+      while(j<line.length && line[j]!=='"') j++;
+      tokens.push({t:'str', v:line.slice(i,j+1)});
+      i=j+1; continue;
+    }
+    // number (standalone)
+    if(/\d/.test(line[i])){
+      let j=i;
+      while(j<line.length && /[\d.]/.test(line[j])) j++;
+      // only colour if surrounded by non-word chars
+      const before = i>0 ? line[i-1] : ' ';
+      const after  = j<line.length ? line[j] : ' ';
+      if(!/\w/.test(before) && !/\w/.test(after)){
+        tokens.push({t:'num', v:line.slice(i,j)});
+      } else {
+        tokens.push({t:'txt', v:line.slice(i,j)});
+      }
+      i=j; continue;
+    }
+    // identifier (word)
+    if(/[a-zA-Z_]/.test(line[i])){
+      let j=i;
+      // allow dots in names for list.add etc
+      while(j<line.length && /[\w_.]/.test(line[j])) j++;
+      const word = line.slice(i,j);
+      // peek past whitespace for '('
+      let k=j; while(k<line.length && line[k]===' ') k++;
+      const hasParen = line[k]==='(';
+      if(hasParen && FN_SET.has(word)){
+        tokens.push({t:'fn', v:word});
+      } else if(KW_SET.has(word)){
+        tokens.push({t:'kw', v:word});
+      } else {
+        tokens.push({t:'txt', v:word});
+      }
+      i=j; continue;
+    }
+    // parens
+    if(line[i]==='('||line[i]===')'){
+      tokens.push({t:'paren', v:line[i++]}); continue;
+    }
+    // braces
+    if(line[i]==='{'||line[i]==='}'){
+      tokens.push({t:'brace', v:line[i++]}); continue;
+    }
+    // = operator (only standalone)
+    if(line[i]==='=' && line[i-1]===' ' && line[i+1]===' '){
+      tokens.push({t:'op', v:'='}); i++; continue;
+    }
+    // anything else — plain
+    tokens.push({t:'txt', v:line[i++]});
+  }
+
+  // render tokens
+  return tokens.map(tk=>{
+    const v = escHtml(tk.v);
+    switch(tk.t){
+      case 'var':   return `<span class="s-var">${v}</span>`;
+      case 'fn':    return `<span class="s-fn">${v}</span>`;
+      case 'kw':    return `<span class="s-kw">${v}</span>`;
+      case 'str':   return `<span class="s-str">${v}</span>`;
+      case 'num':   return `<span class="s-num">${v}</span>`;
+      case 'paren': return `<span class="s-paren">${v}</span>`;
+      case 'brace': return `<span class="s-special">${v}</span>`;
+      case 'op':    return `<span class="s-op">${v}</span>`;
+      default:      return v;
+    }
+  }).join('');
+}
+
+function updateHighlight(){
+  const val = editor.value;
+  highlight.innerHTML = syntaxHL(val) + '\n';
+  charCount.textContent = val.length + ' chars';
+}
+
+function updateLineNums(){
+  const lines = editor.value.split('\n').length;
+  let html='';
+  for(let i=1;i<=lines;i++) html+=`<span id="ln${i}">${i}</span>`;
+  lineNums.innerHTML = html;
+}
+
+function syncScroll(){
+  highlight.scrollTop = editor.scrollTop;
+  highlight.scrollLeft = editor.scrollLeft;
+  lineNums.scrollTop = editor.scrollTop;
+}
+
+editor.addEventListener('input',()=>{updateHighlight();updateLineNums();});
+editor.addEventListener('scroll',syncScroll);
+editor.addEventListener('keydown',e=>{
+  // Tab → 4 spaces
+  if(e.key==='Tab'){
+    e.preventDefault();
+    const s=editor.selectionStart,end=editor.selectionEnd;
+    editor.value=editor.value.substring(0,s)+'    '+editor.value.substring(end);
+    editor.selectionStart=editor.selectionEnd=s+4;
+    updateHighlight();
+  }
+  // Ctrl+Enter → run
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();runScript();}
+  updateHighlight();
+  updateLineNums();
+});
+
+// cursor position
+editor.addEventListener('keyup',updateCursorPos);
+editor.addEventListener('click',updateCursorPos);
+function updateCursorPos(){
+  const val=editor.value.substring(0,editor.selectionStart);
+  const lines=val.split('\n');
+  const ln=lines.length, col=lines[lines.length-1].length+1;
+  sbPos.textContent=`Ln ${ln}, Col ${col}`;
+  // highlight current line number
+  document.querySelectorAll('.line-nums span').forEach(s=>s.classList.remove('hl'));
+  const lnEl=document.getElementById('ln'+ln);
+  if(lnEl)lnEl.classList.add('hl');
+}
+
+// ── INTERPRETER ──
+const output = document.getElementById('output');
+const outInd = document.getElementById('out-ind');
+const sbDot = document.getElementById('sb-dot');
+const sbStatus = document.getElementById('sb-status');
+const varListEl = document.getElementById('var-list');
+const outEmpty = document.getElementById('out-empty');
+
+let variables = {};
+let lists = {};
+let functions = {};
+let inputResolve = null;
+
+function setStatus(s){
+  sbDot.style.background = s==='running'?'var(--yw)':s==='error'?'var(--err)':'var(--ok)';
+  sbStatus.textContent = s==='running'?'Running...':s==='error'?'Error':'Done';
+  outInd.className='out-indicator '+(s==='running'?'running':s==='error'?'err':'done');
+}
+
+function clearOutput(){
+  output.innerHTML='';
+  if(outEmpty){outEmpty.style.display='none';}
+  // re-add empty placeholder but hidden
+}
+
+function printLine(text, cls=''){
+  if(outEmpty) outEmpty.style.display='none';
+  const d=document.createElement('div');d.className='out-line';
+  d.innerHTML=`<span class="out-prompt">›</span><span class="out-text ${cls}">${escHtml(String(text))}</span>`;
+  output.appendChild(d);
+  output.scrollTop=output.scrollHeight;
+}
+
+function printSep(){
+  const hr=document.createElement('hr');hr.className='out-sep';
+  output.appendChild(hr);
+}
+
+function updateVarPanel(){
+  const keys=Object.keys(variables);
+  if(!keys.length){
+    varListEl.innerHTML='<div style="font-family:\'JetBrains Mono\',monospace;font-size:11px;color:var(--dm2);font-style:italic">No variables yet</div>';
+    return;
+  }
+  varListEl.innerHTML='';
+  keys.slice(-12).forEach(k=>{
+    const r=document.createElement('div');r.className='var-row';
+    r.innerHTML=`<span class="var-name">@${k}</span><span class="var-eq">=</span><span class="var-val">${escHtml(String(variables[k]))}</span>`;
+    varListEl.appendChild(r);
+  });
+}
+
+function askInput(prompt){
+  return new Promise(resolve=>{
+    printLine(prompt,'yellow');
+    const wrap=document.createElement('div');wrap.className='out-input-wrap';
+    const inp=document.createElement('input');
+    inp.className='out-input';inp.placeholder='Type here and press Enter...';
+    wrap.appendChild(document.createElement('span')).textContent='›';
+    wrap.appendChild(inp);
+    output.appendChild(wrap);output.scrollTop=output.scrollHeight;
+    inp.focus();
+    inp.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){
+        const v=inp.value;
+        wrap.remove();
+        printLine('› '+v,'dim');
+        resolve(v);
+      }
+    });
+  });
+}
+
+// substitute @vars in a string
+function subVars(s){
+  return String(s).replace(/@([\w_]+)/g,(_,k)=>variables[k]!==undefined?variables[k]:'@'+k);
+}
+
+// parse args from "cmd(arg1, arg2, ...)" → [arg1, arg2]
+function parseArgs(raw){
+  const args=[];let depth=0,cur='';
+  for(const ch of raw){
+    if(ch==='('||ch==='{'||ch==='[')depth++;
+    else if(ch===')'||ch==='}'||ch===']')depth--;
+    if(ch===','&&depth===0){args.push(cur.trim());cur='';}
+    else cur+=ch;
+  }
+  if(cur.trim())args.push(cur.trim());
+  return args;
+}
+
+// parse a single statement, return {cmd, args}
+function parseStmt(line){
+  line=line.trim();
+  if(!line||line.startsWith('#'))return null;
+  // assignment: @varname = value  or  varname = value
+  const assignMatch=line.match(/^@?([\w_]+)\s*=\s*(.+)$/);
+  if(assignMatch&&!line.includes('('))return{cmd:'assign',name:assignMatch[1],val:assignMatch[2]};
+  // cmd(args)
+  const fnMatch=line.match(/^([\w._]+)\s*\(/)  ;
+  if(fnMatch){
+    // find matching close paren
+    const name=fnMatch[1];
+    const rest=line.slice(name.length).trim();
+    // find content between outer parens
+    let depth=0,content='',started=false;
+    for(const ch of rest){
+      if(ch==='('&&!started){started=true;depth=1;continue;}
+      else if(ch==='(')depth++;
+      else if(ch===')')depth--;
+      if(depth===0&&started)break;
+      if(started)content+=ch;
+    }
+    return{cmd:name,args:parseArgs(content)};
+  }
+  // bare keyword: call funcname
+  const callMatch=line.match(/^call\s+([\w_]+)$/);
+  if(callMatch)return{cmd:'call',name:callMatch[1]};
+  // func definition start
+  const funcMatch=line.match(/^func\s+([\w_]+)\s*\{?$/);
+  if(funcMatch)return{cmd:'func_def',name:funcMatch[1]};
+  return{cmd:'raw',line};
+}
+
+// ── MINI INTERPRETER ──
+async function execLines(lines, depth=0){
+  let i=0;
+  while(i<lines.length){
+    const raw=lines[i].trim();
+    if(!raw||raw.startsWith('#')){i++;continue;}
+
+    // func definition
+    if(/^func\s+/.test(raw)){
+      const name=raw.match(/^func\s+([\w_]+)/)[1];
+      i++;
+      const body=[];let bd=1;
+      // collect until matching }
+      while(i<lines.length&&bd>0){
+        const l=lines[i].trim();
+        if(l==='{'||l.endsWith('{'))bd++;
+        if(l==='}'||l.startsWith('}'))bd--;
+        if(bd>0)body.push(lines[i]);
+        i++;
+      }
+      functions[name]=body;
+      i++;continue;
+    }
+
+    // call
+    if(/^call\s+/.test(raw)){
+      const name=raw.match(/^call\s+([\w_]+)/)[1];
+      if(functions[name])await execLines(functions[name],depth+1);
+      else printLine(`Unknown function: ${name}`,'red');
+      i++;continue;
+    }
+
+    // if(cond, { ... } [, { ... }])
+    if(/^if\s*\(/.test(raw)){
+      const content=extractParenContent(raw,'if');
+      const parts=splitAtTopComma(content);
+      const cond=parts[0]?.trim();
+      const thenBlock=parts[1]?extractBraceContent(parts[1].trim()):null;
+      const elseBlock=parts[2]?extractBraceContent(parts[2].trim()):null;
+      const result=evalCond(cond);
+      if(result&&thenBlock)await execLines(thenBlock.split('\n'),depth+1);
+      else if(!result&&elseBlock)await execLines(elseBlock.split('\n'),depth+1);
+      i++;continue;
+    }
+
+    // while(cond, { ... })
+    if(/^while\s*\(/.test(raw)){
+      const content=extractParenContent(raw,'while');
+      const parts=splitAtTopComma(content);
+      const cond=parts[0]?.trim();
+      const block=parts[1]?extractBraceContent(parts[1].trim()):null;
+      let guard=0;
+      while(evalCond(cond)&&block&&guard++<500)await execLines(block.split('\n'),depth+1);
+      i++;continue;
+    }
+
+    // repeat(n, { ... })
+    if(/^repeat\s*\(/.test(raw)){
+      const content=extractParenContent(raw,'repeat');
+      const parts=splitAtTopComma(content);
+      const n=parseInt(subVars(parts[0]?.trim()))||0;
+      const block=parts[1]?extractBraceContent(parts[1].trim()):null;
+      for(let k=0;k<n&&k<500&&block;k++)await execLines(block.split('\n'),depth+1);
+      i++;continue;
+    }
+
+    // assignment: varname = value (no parens)
+    if(/^@?([\w_]+)\s*=\s*/.test(raw)&&!raw.includes('(')){
+      const m=raw.match(/^@?([\w_]+)\s*=\s*(.+)$/);
+      if(m){variables[m[1]]=subVars(m[2].trim());updateVarPanel();}
+      i++;continue;
+    }
+
+    // function call cmd(...)
+    await execCmd(raw);
+    i++;
+  }
+}
+
+function extractParenContent(line, kw){
+  // get everything inside the outer parens of "kw(...)"
+  const start=line.indexOf('(');
+  if(start===-1)return '';
+  let depth=0,content='',begun=false;
+  for(let j=start;j<line.length;j++){
+    if(line[j]==='('){ depth++;if(!begun){begun=true;continue;} }
+    else if(line[j]===')'){depth--;if(depth===0)break;}
+    if(begun)content+=line[j];
+  }
+  return content;
+}
+
+function extractBraceContent(s){
+  s=s.trim();
+  if(s.startsWith('{')&&s.endsWith('}'))return s.slice(1,-1).trim();
+  return s;
+}
+
+function splitAtTopComma(s){
+  const parts=[];let depth=0,cur='';
+  for(const ch of s){
+    if(ch==='('||ch==='{'||ch==='[')depth++;
+    else if(ch===')'||ch==='}'||ch===']')depth--;
+    if(ch===','&&depth===0){parts.push(cur);cur='';}
+    else cur+=ch;
+  }
+  if(cur)parts.push(cur);
+  return parts;
+}
+
+function evalCond(cond){
+  if(!cond)return false;
+  cond=subVars(cond).trim();
+  // and / or
+  if(/\band\b/.test(cond))return cond.split(/\band\b/).every(c=>evalCond(c.trim()));
+  if(/\bor\b/.test(cond))return cond.split(/\bor\b/).some(c=>evalCond(c.trim()));
+  if(/^not\s+/.test(cond))return !evalCond(cond.replace(/^not\s+/,''));
+  // comparisons
+  const ops=[['>=','>='],[' <= ','<='],['!=','!='],[' == ','=='],[' > ','>'],[' < ','<']];
+  for(const [sep,op] of ops){
+    if(cond.includes(sep)){
+      const idx=cond.indexOf(sep);
+      const l=cond.slice(0,idx).trim(),r=cond.slice(idx+sep.length).trim();
+      const lv=isNaN(l)?l:parseFloat(l), rv=isNaN(r)?r:parseFloat(r);
+      if(op==='==')return lv==rv;
+      if(op==='!=')return lv!=rv;
+      if(op==='>') return parseFloat(lv)>parseFloat(rv);
+      if(op==='<') return parseFloat(lv)<parseFloat(rv);
+      if(op==='>=')return parseFloat(lv)>=parseFloat(rv);
+      if(op==='<=')return parseFloat(lv)<=parseFloat(rv);
+    }
+  }
+  // truthy
+  return cond!==''&&cond!=='false'&&cond!=='0';
+}
+
+async function execCmd(line){
+  line=line.trim();
+  if(!line||line.startsWith('#'))return;
+
+  // extract function name
+  const fnMatch=line.match(/^([\w._]+)\s*\(/);
+  if(!fnMatch){
+    // might be bare assignment or bare call
+    if(/^@?([\w_]+)\s*=/.test(line)){
+      const m=line.match(/^@?([\w_]+)\s*=\s*(.+)$/);
+      if(m){variables[m[1]]=subVars(m[2].trim());updateVarPanel();}
+    }
+    return;
+  }
+  const fn=fnMatch[1];
+  const rawContent=extractParenContent(line,fn);
+  const args=parseArgs(rawContent).map(a=>subVars(a.trim()));
+
+  switch(fn){
+    case 'write':
+      printLine(args.join(' '),'green');
+      break;
+    case 'input': {
+      const prompt=args[0]||'';
+      const varName=args[1];
+      const val=await askInput(prompt);
+      if(varName)variables[varName.replace('@','')]=val;
+      variables['_']=val;
+      updateVarPanel();
+      break;
+    }
+    case 'calc': {
+      try{
+        let expr=args[0]||'0';
+        // replace sqrt, pow, abs
+        expr=expr.replace(/sqrt\(([^)]+)\)/g,(_,x)=>Math.sqrt(parseFloat(x)));
+        expr=expr.replace(/pow\(([^,]+),([^)]+)\)/g,(_,b,e)=>Math.pow(parseFloat(b),parseFloat(e)));
+        expr=expr.replace(/abs\(([^)]+)\)/g,(_,x)=>Math.abs(parseFloat(x)));
+        const res=Function('"use strict";return ('+expr+')')();
+        const rounded=Math.round(res*1000000)/1000000;
+        const varName=args[1]?.replace('@','');
+        if(varName)variables[varName]=String(rounded);
+        variables['_']=String(rounded);
+        if(!varName)printLine(String(rounded),'teal');
+        updateVarPanel();
+      }catch(e){printLine('calc error: '+e.message,'red');}
+      break;
+    }
+    case 'wait':
+      await new Promise(r=>setTimeout(r,Math.min(parseInt(args[0])||0,3000)));
+      break;
+    case 'exit':
+      printLine('[exit called]','dim');
+      throw new Error('__exit__');
+    case 'clear':
+      clearOutput();
+      break;
+
+    // LIST commands
+    case 'list.new': lists[args[0]]=[];break;
+    case 'list.add': if(lists[args[0]])lists[args[0]].push(args[1]);break;
+    case 'list.get': {
+      const v=lists[args[0]]?.[parseInt(args[1])];
+      variables['_']=String(v??'');
+      if(v!==undefined)printLine(String(v),'teal');
+      updateVarPanel();break;
+    }
+    case 'list.set': if(lists[args[0]])lists[args[0]][parseInt(args[1])]=args[2];break;
+    case 'list.remove': if(lists[args[0]])lists[args[0]].splice(parseInt(args[1]),1);break;
+    case 'list.pop': {
+      const v=lists[args[0]]?.pop();
+      variables['_']=String(v??'');
+      if(v!==undefined)printLine(String(v),'teal');
+      updateVarPanel();break;
+    }
+    case 'list.len': {
+      const l=lists[args[0]]?.length??0;
+      variables['_']=String(l);
+      printLine(String(l),'teal');
+      updateVarPanel();break;
+    }
+    case 'list.clear': if(lists[args[0]])lists[args[0]]=[];break;
+    case 'list.delete': delete lists[args[0]];break;
+    case 'list.print':
+      (lists[args[0]]||[]).forEach((v,i)=>printLine(`[${i}] ${v}`,'teal'));
+      break;
+    case 'list.contains': {
+      const r=String((lists[args[0]]||[]).includes(args[1]));
+      variables['_']=r;printLine(r,'teal');updateVarPanel();break;
+    }
+    case 'list.indexof': {
+      const r=String((lists[args[0]]||[]).indexOf(args[1]));
+      variables['_']=r;printLine(r,'teal');updateVarPanel();break;
+    }
+    case 'list.join': {
+      const r=(lists[args[0]]||[]).join(args[1]??',');
+      variables['_']=r;printLine(r,'teal');updateVarPanel();break;
+    }
+    case 'list.reverse': if(lists[args[0]])lists[args[0]].reverse();break;
+
+    // strtools plugin simulation
+    case 'upper': {const r=(args[0]||'').toUpperCase();variables['_']=r;printLine(r,'teal');updateVarPanel();break;}
+    case 'lower': {const r=(args[0]||'').toLowerCase();variables['_']=r;printLine(r,'teal');updateVarPanel();break;}
+    case 'length': {const r=String((args[0]||'').length);variables['_']=r;printLine(r,'teal');updateVarPanel();break;}
+    case 'reverse': {const r=(args[0]||'').split('').reverse().join('');variables['_']=r;printLine(r,'teal');updateVarPanel();break;}
+    case 'replace': {const r=(args[0]||'').split(args[1]||'').join(args[2]||'');variables['_']=r;printLine(r,'teal');updateVarPanel();break;}
+    case 'contains': {const r=String((args[0]||'').includes(args[1]||''));variables['_']=r;printLine(r,'teal');updateVarPanel();break;}
+    case 'trim': {const r=(args[0]||'').trim();variables['_']=r;printLine(r,'teal');updateVarPanel();break;}
+    case 'repeat_str': {const r=(args[0]||'').repeat(parseInt(args[1])||1);variables['_']=r;printLine(r,'teal');updateVarPanel();break;}
+
+    // tinyai — simulated with Anthropic API
+    case 'tinyai':
+    case 'ai':
+    case 'llm': {
+      const prompt=args[0]||'';
+      const varName=(args[1]||'_').replace('@','');
+      printLine(`[AI] Thinking about: "${prompt.slice(0,50)}..."`, 'dim');
+      try{
+        const resp = await fetch('https://api.anthropic.com/v1/messages',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({
+            model:'claude-sonnet-4-20250514',
+            max_tokens:300,
+            messages:[{role:'user',content:`You are simulating the Mint scripting language AI command. Respond concisely (1-3 sentences max) to: ${prompt}`}]
+          })
+        });
+        const data=await resp.json();
+        const text=data.content?.[0]?.text||'[No response]';
+        variables[varName]=text;
+        variables['_']=text;
+        printLine('[AI] '+text,'blue');
+        updateVarPanel();
+      }catch(e){
+        const simResp=`[simulated] Response to: "${prompt.slice(0,30)}"`;
+        variables[varName]=simResp;variables['_']=simResp;
+        printLine(simResp,'blue');updateVarPanel();
+      }
+      break;
+    }
+
+    case 'browser':
+      printLine(`[browser] Would open Chrome in ${args[0]||'chrome'} mode`,'yellow');
+      printLine('(Browser automation requires the full Mint runtime)','dim');break;
+    case 'website':
+      printLine(`[browser] Would navigate to ${args[0]}`,'yellow');break;
+    case 'dialog':
+      printLine(`[dialog] ${args[0]?.toUpperCase()||'INFO'}: ${args[1]||''} — ${args[2]||''}`,'yellow');break;
+    case 'sys':
+      printLine(`[sys] Would run: ${args[0]}`,'yellow');break;
+    case 'playsound':
+      printLine(`[media] Would play: ${args[0]}`,'yellow');break;
+    case 'image':
+      printLine(`[media] Would show image: ${args[0]}`,'yellow');break;
+
+    default:
+      printLine(`Unknown command: ${fn}`,'red');
+  }
+}
+
+async function runScript(){
+  const code=editor.value;
+  if(!code.trim())return;
+  clearOutput();
+  variables={};lists={};functions={};
+  updateVarPanel();
+  setStatus('running');
+  const runBtn=document.getElementById('btn-run');
+  runBtn.classList.add('loading');runBtn.textContent='⏳ Running';
+
+  printSep();
+  printLine('Running script.mint','dim');
+  printSep();
+
+  const lines=code.split('\n');
+  try{
+    await execLines(lines);
+    printSep();
+    printLine('Script finished.','dim');
+    setStatus('done');
+  }catch(e){
+    if(e.message==='__exit__'){
+      printSep();printLine('Script exited.','dim');setStatus('done');
+    } else {
+      printSep();
+      printLine('Runtime error: '+e.message,'red');
+      setStatus('error');
+    }
+  }
+  runBtn.classList.remove('loading');runBtn.textContent='▶ Run';
+}
+
+document.getElementById('btn-run').addEventListener('click',runScript);
+document.getElementById('btn-clear-out').addEventListener('click',()=>{
+  clearOutput();
+  output.innerHTML='<div class="out-empty">Output cleared</div>';
+  outInd.className='out-indicator';
+});
+document.getElementById('btn-clear-editor').addEventListener('click',()=>{
+  editor.value='';updateHighlight();updateLineNums();
+});
+document.getElementById('btn-share').addEventListener('click',()=>{
+  const encoded=btoa(encodeURIComponent(editor.value));
+  const url=location.href.split('?')[0]+'?code='+encoded;
+  navigator.clipboard.writeText(url).then(()=>{
+    const btn=document.getElementById('btn-share');
+    btn.textContent='✓ Copied!';btn.style.color='var(--g)';
+    setTimeout(()=>{btn.textContent='🔗 Share';btn.style.color='';},2000);
+  });
+});
+
+// load from URL
+(function(){
+  const params=new URLSearchParams(location.search);
+  const code=params.get('code');
+  if(code){
+    try{setCode(decodeURIComponent(atob(code)));}catch(e){}
+  }
+})();
+
+// keyboard shortcut hint
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter')runScript();
+});
+</script>
+</body>
+</html>

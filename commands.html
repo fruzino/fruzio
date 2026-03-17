@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mint | Command Reference</title>
+<meta name="google-adsense-account" content="ca-pub-4768903876434099">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --g: #7bda6a; --g2: #4ea843;
+  --g-glow: rgba(123,218,106,0.18); --g-glow2: rgba(123,218,106,0.05);
+  --bg: #111312; --bg2: #181b18; --bg3: #1e221e;
+  --border: rgba(123,218,106,0.12); --border2: rgba(255,255,255,0.06);
+  --text: #d8e8d4; --dim: #5a6e56;
+  --teal: #4ec9b0; --orange: #ce9178; --blue: #6ab0f5;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+}
+/* HEADER */
+header {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 40px; height: 64px;
+  background: rgba(17,19,18,0.92); backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+.logo-wrap { display:flex; flex-direction:column; align-items:flex-start; text-decoration:none; gap:0; }
+.logo-sub { font-size:10px; font-weight:500; letter-spacing:.18em; text-transform:uppercase; color:var(--dim); }
+.logo-main { display:flex; align-items:center; gap:8px; }
+.logo-main span { font-family:'DM Serif Display',serif; font-size:26px; color:#fff; line-height:1; }
+.logo-main img { height:24px; }
+.search-wrap { display:flex; align-items:center; gap:8px; }
+.search-wrap img { height:18px; opacity:.4; }
+.search-wrap input {
+  background:var(--bg3); border:1px solid var(--border2); border-radius:8px;
+  padding:7px 14px; color:var(--text); font-size:13px; font-family:'DM Sans',sans-serif;
+  width:200px; outline:none; transition:border-color .2s, box-shadow .2s;
+}
+.search-wrap input:focus { border-color:var(--g); box-shadow:0 0 0 3px var(--g-glow2); }
+/* LAYOUT */
+.layout { display:flex; min-height:calc(100vh - 64px); }
+/* SIDEBAR */
+nav {
+  width:230px; flex-shrink:0;
+  background:var(--bg2); border-right:1px solid var(--border);
+  padding:24px 0; position:sticky; top:64px;
+  height:calc(100vh - 64px); overflow-y:auto;
+  scrollbar-width:thin; scrollbar-color:var(--border2) transparent;
+}
+nav::-webkit-scrollbar { width:3px; }
+nav::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
+.nav-logo {
+  padding:0 18px 18px; border-bottom:1px solid var(--border); margin-bottom:6px;
+  font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700;
+  letter-spacing:.12em; color:var(--dim);
+}
+.nav-logo span { color:var(--g); }
+.nav-sec {
+  padding:14px 18px 4px; font-size:10px; font-weight:500;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--dim);
+}
+nav a {
+  display:flex; align-items:center; padding:5px 18px; font-size:13px;
+  color:#6a8066; text-decoration:none; transition:color .15s, background .15s;
+  position:relative;
+}
+nav a::before {
+  content:''; position:absolute; left:0; top:50%; transform:translateY(-50%);
+  width:2px; height:0; background:var(--g); border-radius:0 2px 2px 0;
+  transition:height .2s;
+}
+nav a:hover { color:var(--text); background:var(--g-glow2); }
+nav a:hover::before, nav a.active::before { height:55%; }
+nav a.active { color:var(--g); background:var(--g-glow2); }
+/* MAIN */
+main { flex:1; padding:48px 64px 80px; min-width:0; }
+.page-title { font-family:'DM Serif Display',serif; font-size:36px; color:#fff; margin-bottom:8px; }
+.page-sub { color:var(--dim); font-size:14px; margin-bottom:48px; line-height:1.7; }
+.page-sub code { color:var(--orange); background:rgba(206,145,120,.1); padding:1px 5px; border-radius:3px; font-family:'JetBrains Mono',monospace; font-size:12px; }
+/* SECTION */
+.sec {
+  display:flex; align-items:center; gap:12px;
+  margin:52px 0 18px; padding-bottom:12px; border-bottom:1px solid var(--border);
+}
+.sec-num {
+  font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--g);
+  background:var(--g-glow2); border:1px solid var(--border); border-radius:5px;
+  padding:3px 8px; letter-spacing:.05em;
+}
+.sec h2 { font-family:'DM Serif Display',serif; font-size:21px; color:#e4f0e0; font-weight:400; }
+/* CMD BLOCK */
+.cb {
+  background:var(--bg2); border:1px solid var(--border2); border-radius:10px;
+  margin:12px 0; overflow:hidden; transition:border-color .2s, box-shadow .2s;
+}
+.cb:hover { border-color:var(--border); box-shadow:0 0 0 1px var(--g-glow), 0 4px 20px rgba(0,0,0,.4); }
+.ch {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 18px;
+  background:linear-gradient(90deg,rgba(123,218,106,.07) 0%,transparent 100%);
+  border-bottom:1px solid var(--border2);
+}
+.cn { font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600; color:var(--teal); }
+.ct {
+  font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--dim);
+  background:var(--bg3); border:1px solid var(--border2); border-radius:4px;
+  padding:2px 7px; letter-spacing:.07em; text-transform:uppercase; white-space:nowrap; flex-shrink:0;
+}
+.cbody { padding:14px 18px; }
+.cbody p { font-size:13.5px; color:#9ab096; margin-bottom:10px; }
+.cbody p:last-child { margin-bottom:0; }
+/* NOTE */
+.note {
+  display:flex; align-items:flex-start; gap:10px;
+  background:linear-gradient(90deg,rgba(123,218,106,.05),transparent);
+  border:1px solid var(--border); border-radius:7px;
+  padding:9px 13px; margin:10px 0; font-size:13px; color:#7a9876;
+}
+.note::before { content:'▸'; color:var(--g); flex-shrink:0; margin-top:1px; }
+/* CODE */
+code {
+  font-family:'JetBrains Mono',monospace; font-size:12px;
+  color:var(--orange); background:rgba(206,145,120,.08);
+  padding:1px 5px; border-radius:3px; border:1px solid rgba(206,145,120,.12);
+}
+pre {
+  font-family:'JetBrains Mono',monospace; font-size:12.5px;
+  background:#0c0e0c; border:1px solid rgba(255,255,255,.05); border-radius:8px;
+  padding:14px 16px; overflow-x:auto; color:var(--orange); line-height:1.75;
+  margin:10px 0; position:relative;
+}
+pre::before {
+  content:''; position:absolute; top:0; left:0; width:3px; height:100%;
+  background:linear-gradient(180deg,var(--g),transparent); border-radius:8px 0 0 8px;
+}
+/* TABLE */
+.pt { width:100%; border-collapse:collapse; font-size:13px; margin-top:10px; }
+.pt th {
+  text-align:left; padding:7px 10px; color:var(--dim);
+  font-size:10px; font-weight:500; letter-spacing:.1em; text-transform:uppercase;
+  border-bottom:1px solid var(--border2); background:rgba(0,0,0,.2);
+}
+.pt td { padding:8px 10px; border-bottom:1px solid rgba(255,255,255,.03); vertical-align:top; color:#9ab096; }
+.pt tr:last-child td { border-bottom:none; }
+.pt tr:hover td { background:var(--g-glow2); }
+.ty { color:var(--blue); font-family:'JetBrains Mono',monospace; font-size:11px; }
+footer {
+  margin-top:72px; padding:20px 0 0; border-top:1px solid var(--border);
+  color:var(--dim); font-size:11px; text-align:center;
+}
+#bar {
+  position:fixed; top:64px; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,var(--g),var(--teal));
+  transform-origin:left; transform:scaleX(0); z-index:200;
+}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<header>
+  <a href="index.html" class="logo-wrap">
+    <span class="logo-sub">Fruzio</span>
+    <div class="logo-main"><span>Mint</span><img src="Mint.png" alt=""></div>
+  </a>
+  <div class="search-wrap">
+    <img src="Search.png" alt="">
+    <input type="text" placeholder="Search commands...">
+  </div>
+</header>
+<div class="layout">
+<nav id="nav">
+  <div class="nav-logo">MINT <span>DOC</span></div>
+  <div class="nav-sec">Basics</div>
+  <a href="#write">write</a><a href="#input">input</a><a href="#calc">calc</a>
+  <a href="#wait">wait</a><a href="#sys">sys</a><a href="#exit">exit</a>
+  <div class="nav-sec">Logic</div>
+  <a href="#if">if</a><a href="#repeat">repeat</a><a href="#while">while</a><a href="#func">func / call</a>
+  <div class="nav-sec">Lists</div>
+  <a href="#list-new">list.new / list.add</a><a href="#list-get">list.get / list.set</a>
+  <a href="#list-remove">list.remove / list.pop</a><a href="#list-util">utilities</a>
+  <div class="nav-sec">Files</div>
+  <a href="#run">run</a><a href="#file">file</a><a href="#locate">locate</a>
+  <div class="nav-sec">Media</div>
+  <a href="#img">image</a><a href="#video">video</a><a href="#sound">playsound</a>
+  <div class="nav-sec">Browser</div>
+  <a href="#browser">browser</a><a href="#click">click / type</a><a href="#gettext">gettext</a>
+  <div class="nav-sec">UI</div>
+  <a href="#dialog">dialog</a>
+  <div class="nav-sec">AI</div>
+  <a href="#tinyai">tinyai</a><a href="#ai">ai</a><a href="#llm">llm</a>
+  <div class="nav-sec">Plugins</div>
+  <a href="#plugins">Using plugins</a><a href="#strtools">strtools</a>
+</nav>
+<main>
+  <h1 class="page-title">Command Reference</h1>
+  <p class="page-sub">Complete reference for the Mint scripting language (C build).<br>
+  Commands are called as <code>command(args)</code>. Args are comma-separated. Use <code>@varname</code> to inject variables anywhere.</p>
+
+  <!-- BASICS -->
+  <div class="sec" id="basics"><span class="sec-num">01</span><h2>Basic Commands</h2></div>
+
+  <div class="cb" id="write">
+    <div class="ch"><div class="cn">write( text )</div><span class="ct">output</span></div>
+    <div class="cbody">
+      <p>Prints text or variable values to the console. Use <code>@varname</code> to inject a variable's value.</p>
+      <pre>name = Alice
+write(Hello, @name!)
+write(Score: @score points)</pre>
+      <table class="pt"><tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+      <tr><td><code>text</code></td><td class="ty">Text / Var</td><td>Content to display. <code>@var</code> is expanded inline.</td></tr></table>
+    </div>
+  </div>
+
+  <div class="cb" id="input">
+    <div class="ch"><div class="cn">input( varname, prompt )</div><span class="ct">input</span></div>
+    <div class="cbody">
+      <p>Displays a prompt and stores the user's response in a variable.</p>
+      <pre>input(username, What is your name?)
+write(Hello, @username!)</pre>
+      <table class="pt"><tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+      <tr><td><code>varname</code></td><td class="ty">ID</td><td>Variable name to store the result.</td></tr>
+      <tr><td><code>prompt</code></td><td class="ty">Text</td><td>Message shown to the user.</td></tr></table>
+    </div>
+  </div>
+
+  <div class="cb" id="calc">
+    <div class="ch"><div class="cn">x = calc( expression )</div><span class="ct">math</span></div>
+    <div class="cbody">
+      <p>Evaluates a math expression and stores the result. Supports <code>+ - * / %</code>, parentheses, <code>sqrt()</code> <code>abs()</code> <code>pow(x,y)</code>. Use <code>@var</code> inside to reference numbers.</p>
+      <pre>a = calc(10 + 5)
+b = calc(@a * 3)
+c = calc(sqrt(144))
+d = calc(pow(2, 8))</pre>
+    </div>
+  </div>
+
+  <div class="cb" id="wait">
+    <div class="ch"><div class="cn">wait( seconds )</div><span class="ct">timing</span></div>
+    <div class="cbody">
+      <p>Pauses execution for the given duration. Accepts decimals like <code>0.5</code>.</p>
+      <pre>write(Starting...)
+wait(1.5)
+write(Done!)</pre>
+    </div>
+  </div>
+
+  <div class="cb" id="sys">
+    <div class="ch"><div class="cn">sys( command )</div><span class="ct">system</span></div>
+    <div class="cbody">
+      <p>Passes a command directly to the OS shell.</p>
+      <pre>sys(echo Hello from OS)
+sys(mkdir output)</pre>
+    </div>
+  </div>
+
+  <div class="cb" id="exit">
+    <div class="ch"><div class="cn">exit()</div><span class="ct">control</span></div>
+    <div class="cbody"><p>Immediately terminates the Mint process.</p></div>
+  </div>
+
+  <!-- LOGIC -->
+  <div class="sec" id="logic"><span class="sec-num">02</span><h2>Control Flow</h2></div>
+
+  <div class="cb" id="if">
+    <div class="ch"><div class="cn">if( condition, { block } )</div><span class="ct">logic</span></div>
+    <div class="cbody">
+      <p>Evaluates a condition. If true, runs the block. Operators: <code>== != &lt; &gt; &lt;= &gt;=</code> and logical <code>and</code> <code>or</code> <code>not</code> <code>nand</code> <code>nor</code>. Blocks can span multiple lines.</p>
+      <pre>score = 85
+if(@score >= 90, {
+    write(Grade: A)
+})
+if(@score >= 75 and @score < 90, {
+    write(Grade: B)
+})</pre>
+    </div>
+  </div>
+
+  <div class="cb" id="repeat">
+    <div class="ch"><div class="cn">repeat( N, { block } )</div><span class="ct">loop</span></div>
+    <div class="cbody">
+      <p>Runs the block exactly N times.</p>
+      <pre>counter = 0
+repeat(5, {
+    counter = calc(@counter + 1)
+    write(Count: @counter)
+})</pre>
+    </div>
+  </div>
+
+  <div class="cb" id="while">
+    <div class="ch"><div class="cn">while( condition, { block } )</div><span class="ct">loop</span></div>
+    <div class="cbody">
+      <p>Runs the block as long as the condition is true. Condition re-evaluated each iteration.</p>
+      <pre>n = 1
+while(@n < 100, {
+    write(@n)
+    n = calc(@n * 2)
+})</pre>
+    </div>
+  </div>
+
+  <div class="cb" id="func">
+    <div class="ch"><div class="cn">func name { block } &nbsp;·&nbsp; call name</div><span class="ct">function</span></div>
+    <div class="cbody">
+      <p>Defines a reusable named function. <code>call</code> runs it. Functions share the global variable store.</p>
+      <pre>func greet {
+    write(Hello from a function!)
+    write(Version: @version)
+}
+call greet</pre>
+    </div>
+  </div>
+
+  <!-- LISTS -->
+  <div class="sec" id="lists"><span class="sec-num">03</span><h2>Lists</h2></div>
+  <div class="note">All list commands that return a value also store it in <code>@_</code> for immediate use.</div>
+
+  <div class="cb" id="list-new">
+    <div class="ch"><div class="cn">list.new( name ) &nbsp;·&nbsp; list.add( name, value )</div><span class="ct">list</span></div>
+    <div class="cbody">
+      <p>Creates a new empty list. <code>list.add</code> appends a value to the end.</p>
+      <pre>list.new(fruits)
+list.add(fruits, apple)
+list.add(fruits, banana)
+list.add(fruits, cherry)</pre>
+    </div>
+  </div>
+
+  <div class="cb" id="list-get">
+    <div class="ch"><div class="cn">list.get( name, index ) &nbsp;·&nbsp; list.set( name, index, value )</div><span class="ct">list</span></div>
+    <div class="cbody">
+      <p><code>list.get</code> prints the item at that index and stores it in <code>@_</code>. <code>list.set</code> replaces it. Indexes start at <code>0</code>.</p>
+      <pre>list.get(fruits, 0)
+write(First: @_)
+list.set(fruits, 1, blueberry)</pre>
+    </div>
+  </div>
+
+  <div class="cb" id="list-remove">
+    <div class="ch"><div class="cn">list.remove( name, index ) &nbsp;·&nbsp; list.pop( name )</div><span class="ct">list</span></div>
+    <div class="cbody">
+      <p><code>list.remove</code> deletes the item at an index. <code>list.pop</code> removes and returns the last item into <code>@_</code>.</p>
+      <pre>list.remove(fruits, 0)
+list.pop(fruits)
+write(Popped: @_)</pre>
+    </div>
+  </div>
+
+  <div class="cb" id="list-util">
+    <div class="ch"><div class="cn">List Utilities</div><span class="ct">list</span></div>
+    <div class="cbody">
+      <table class="pt">
+        <tr><th>Command</th><th>Description</th></tr>
+        <tr><td><code>list.len(name)</code></td><td>Prints item count, stores in <code>@_</code>.</td></tr>
+        <tr><td><code>list.print(name)</code></td><td>Prints all items numbered.</td></tr>
+        <tr><td><code>list.contains(name, value)</code></td><td>Prints <code>True</code> / <code>False</code>, stores in <code>@_</code>.</td></tr>
+        <tr><td><code>list.indexof(name, value)</code></td><td>Prints index or <code>-1</code>, stores in <code>@_</code>.</td></tr>
+        <tr><td><code>list.join(name, sep)</code></td><td>Joins all items into a string, stores in <code>@_</code>.</td></tr>
+        <tr><td><code>list.reverse(name)</code></td><td>Reverses the list in place.</td></tr>
+        <tr><td><code>list.clear(name)</code></td><td>Empties the list.</td></tr>
+        <tr><td><code>list.delete(name)</code></td><td>Destroys the list entirely.</td></tr>
+      </table>
+      <pre>list.join(fruits, |)
+write(Joined: @_)
+list.contains(fruits, apple)
+write(Has apple: @_)</pre>
+    </div>
+  </div>
+
+  <!-- FILES -->
+  <div class="sec" id="files"><span class="sec-num">04</span><h2>File Commands</h2></div>
+
+  <div class="cb" id="run">
+    <div class="ch"><div class="cn">run( file )</div><span class="ct">files</span></div>
+    <div class="cbody">
+      <p>Executes a file. Supports <code>.mint</code>, <code>.bat</code>, and <code>.reg</code>.</p>
+      <pre>run(setup.mint)
+run(install.bat)
+run(setup.reg)</pre>
+      <table class="pt">
+        <tr><th>Extension</th><th>Behaviour</th></tr>
+        <tr><td><code>.mint</code></td><td>Interpreted by Mint line by line.</td></tr>
+        <tr><td><code>.bat</code></td><td>Executed via <code>cmd /c</code> (Windows).</td></tr>
+        <tr><td><code>.reg</code></td><td>Applied via <code>reg import</code> (requires admin).</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="cb" id="file">
+    <div class="ch"><div class="cn">file( path )</div><span class="ct">files</span></div>
+    <div class="cbody">
+      <p>Opens or executes any file. Same extension support as <code>run()</code> plus executables.</p>
+      <pre>file(notepad.exe)
+file(launcher.bat)</pre>
+    </div>
+  </div>
+
+  <div class="cb" id="locate">
+    <div class="ch"><div class="cn">locate( path, action )</div><span class="ct">files</span></div>
+    <div class="cbody">
+      <p>Runs an action only if the given file exists.</p>
+      <pre>locate(config.mint, run(config.mint))</pre>
+    </div>
+  </div>
+
+  <!-- MEDIA -->
+  <div class="sec" id="media"><span class="sec-num">05</span><h2>Media</h2></div>
+  <div class="note">Handled by <code>mint_media.py</code>. Requires <code>python-vlc</code>, <code>playsound3</code>, <code>climage</code>.</div>
+
+  <div class="cb" id="img">
+    <div class="ch"><div class="cn">image( file )</div><span class="ct">media</span></div>
+    <div class="cbody">
+      <p>Renders an image in the terminal using Unicode block characters via <code>climage</code>.</p>
+      <pre>image(photo.png)</pre>
+    </div>
+  </div>
+
+  <div class="cb" id="video">
+    <div class="ch"><div class="cn">video( file )</div><span class="ct">media</span></div>
+    <div class="cbody">
+      <p>Plays video via VLC. Supports <code>.mp4</code>, <code>.mkv</code>, <code>.avi</code> and all VLC formats.</p>
+      <pre>video(clip.mp4)</pre>
+      <table class="pt">
+        <tr><th>Command</th><th>Description</th></tr>
+        <tr><td><code>vstop()</code></td><td>Stop playback.</td></tr>
+        <tr><td><code>vvolume(N)</code></td><td>Set volume 0–100.</td></tr>
+        <tr><td><code>vseek(ms)</code></td><td>Jump to position in milliseconds.</td></tr>
+        <tr><td><code>vlength()</code></td><td>Get total duration in milliseconds.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="cb" id="sound">
+    <div class="ch"><div class="cn">playsound( file ) &nbsp;·&nbsp; stopsound()</div><span class="ct">media</span></div>
+    <div class="cbody">
+      <p>Plays an audio file non-blocking. Call <code>stopsound()</code> to stop it.</p>
+      <pre>playsound(music.mp3)
+wait(5)
+stopsound()</pre>
+    </div>
+  </div>
+
+  <!-- BROWSER -->
+  <div class="sec" id="browser-section"><span class="sec-num">06</span><h2>Browser Automation</h2></div>
+  <div class="note">Handled by <code>mint_browser.py</code>. Requires <code>selenium</code> and ChromeDriver.</div>
+
+  <div class="cb" id="browser">
+    <div class="ch"><div class="cn">browser( mode )</div><span class="ct">browser</span></div>
+    <div class="cbody">
+      <p>Opens a Chrome session. <code>chrome</code> for a visible window, <code>incog</code> for headless.</p>
+      <pre>browser(chrome)
+website(https://example.com)</pre>
+    </div>
+  </div>
+
+  <div class="cb" id="click">
+    <div class="ch"><div class="cn">click( BY, selector, wait ) &nbsp;·&nbsp; type( BY, selector, wait, text )</div><span class="ct">browser</span></div>
+    <div class="cbody">
+      <p>Clicks or types into a page element. <code>BY</code>: <code>ID</code>, <code>NAME</code>, <code>XPATH</code>, <code>CSS_SELECTOR</code>.</p>
+      <pre>click(ID, submit-btn, 10)
+type(NAME, q, 10, hello world)</pre>
+    </div>
+  </div>
+
+  <div class="cb" id="gettext">
+    <div class="ch"><div class="cn">gettext( BY, selector, wait, varname )</div><span class="ct">browser</span></div>
+    <div class="cbody">
+      <p>Reads text from a page element and stores it in a variable.</p>
+      <pre>gettext(ID, result-box, 10, result)
+write(Page said: @result)</pre>
+    </div>
+  </div>
+
+  <!-- UI -->
+  <div class="sec" id="ui"><span class="sec-num">07</span><h2>UI Dialogs</h2></div>
+  <div class="note">Real <code>tkinter</code> popups via <code>mint_dialog.py</code>.</div>
+
+  <div class="cb" id="dialog">
+    <div class="ch"><div class="cn">dialog( type, title, message [, varname] )</div><span class="ct">ui</span></div>
+    <div class="cbody">
+      <p>Shows a native OS dialog. For <code>ask</code> / <code>okcancel</code>, the optional <code>varname</code> stores <code>True</code> or <code>False</code>.</p>
+      <pre>dialog(info, Welcome, Mint is ready!)
+dialog(ask, Confirm, Continue?, answer)
+if(@answer == True, {
+    write(User confirmed.)
+})</pre>
+      <table class="pt">
+        <tr><th>Type</th><th>Description</th></tr>
+        <tr><td><code>info / inf</code></td><td>Information popup.</td></tr>
+        <tr><td><code>error / err</code></td><td>Error popup.</td></tr>
+        <tr><td><code>warning / warn</code></td><td>Warning popup.</td></tr>
+        <tr><td><code>ask / yesno</code></td><td>Yes/No — stores result in varname.</td></tr>
+        <tr><td><code>okcancel / confirm</code></td><td>OK/Cancel — stores result in varname.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- AI -->
+  <div class="sec" id="ai-section"><span class="sec-num">08</span><h2>Artificial Intelligence</h2></div>
+  <div class="note">Handled by <code>mint_ai.py</code>. Install dependencies with <code>mod.bat</code>.</div>
+
+  <div class="cb" id="tinyai">
+    <div class="ch"><div class="cn">tinyai( prompt, varname, instructions, datafile )</div><span class="ct">ai · offline</span></div>
+    <div class="cbody">
+      <p>Fully offline local LLM via a <code>.gguf</code> model and <code>llama-server.exe</code>. Server starts automatically.</p>
+      <pre>tinyai(What is the capital of France?, reply, You are a geography expert., .default)
+write(@reply)</pre>
+      <table class="pt">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td><code>prompt</code></td><td class="ty">Text</td><td>Question or instruction.</td></tr>
+        <tr><td><code>varname</code></td><td class="ty">ID</td><td>Variable to store the AI response.</td></tr>
+        <tr><td><code>instructions</code></td><td class="ty">Text</td><td>System prompt / role.</td></tr>
+        <tr><td><code>datafile</code></td><td class="ty">Path</td><td>Context file, or <code>.default</code> for <code>dataset.txt</code>.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="cb" id="ai">
+    <div class="ch"><div class="cn">ai( model, key, role, message, varname )</div><span class="ct">ai · online</span></div>
+    <div class="cbody">
+      <p>Sends a prompt to an OpenAI-compatible API. Requires internet and a valid API key.</p>
+      <pre>ai(gpt-4o, sk-YOUR-KEY, You are helpful., What is Mint?, reply)
+write(@reply)</pre>
+      <table class="pt">
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td><code>model</code></td><td class="ty">String</td><td>Model ID, e.g. <code>gpt-4o</code>.</td></tr>
+        <tr><td><code>key</code></td><td class="ty">String</td><td>Your API key.</td></tr>
+        <tr><td><code>role</code></td><td class="ty">Text</td><td>System role definition.</td></tr>
+        <tr><td><code>message</code></td><td class="ty">Text</td><td>User prompt.</td></tr>
+        <tr><td><code>varname</code></td><td class="ty">ID</td><td>Variable to store the response.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="cb" id="llm">
+    <div class="ch"><div class="cn">llm( model, key, role, message, varname )</div><span class="ct">ai · multi-provider</span></div>
+    <div class="cbody">
+      <p>Like <code>ai()</code> but routes through <code>litellm</code>, supporting Anthropic, Cohere, Mistral, and others.</p>
+      <pre>llm(claude-3-5-haiku-20241022, sk-ant-KEY, You are helpful., Hello!, reply)</pre>
+    </div>
+  </div>
+
+  <!-- PLUGINS -->
+  <div class="sec" id="plugins-section"><span class="sec-num">09</span><h2>Plugins</h2></div>
+
+  <div class="cb" id="plugins">
+    <div class="ch"><div class="cn">Using Plugins</div><span class="ct">extend</span></div>
+    <div class="cbody">
+      <p>Plugins extend Mint with new commands. Each plugin is a subfolder under <code>plugins\</code> with a <code>Plugin.py</code> and <code>Plugin.plug</code>. They load at startup — no imports needed.</p>
+      <pre>plugins\
+  strtools\
+    Plugin.py
+    Plugin.plug</pre>
+      <p>Each <code>Plugin.plug</code> registers commands:</p>
+      <pre>script = plugins/strtools/Plugin.py
+cmd    = upper
+cmd    = lower</pre>
+    </div>
+  </div>
+
+  <div class="cb" id="strtools">
+    <div class="ch"><div class="cn">strtools plugin</div><span class="ct">built-in plugin</span></div>
+    <div class="cbody">
+      <p>String utility plugin shipped with Mint.</p>
+      <table class="pt">
+        <tr><th>Command</th><th>Description</th><th>Example</th></tr>
+        <tr><td><code>upper(text)</code></td><td>Converts to UPPERCASE</td><td><code>upper(hello)</code> → <code>HELLO</code></td></tr>
+        <tr><td><code>lower(text)</code></td><td>Converts to lowercase</td><td><code>lower(HELLO)</code> → <code>hello</code></td></tr>
+        <tr><td><code>reverse(text)</code></td><td>Reverses the string</td><td><code>reverse(abc)</code> → <code>cba</code></td></tr>
+        <tr><td><code>length(text)</code></td><td>Prints character count</td><td><code>length(Hello)</code> → <code>5</code></td></tr>
+        <tr><td><code>replace(text, old, new)</code></td><td>Swaps a substring</td><td><code>replace(hi world, world, Mint)</code></td></tr>
+        <tr><td><code>contains(text, search)</code></td><td>Prints True or False</td><td><code>contains(Mint, int)</code> → <code>True</code></td></tr>
+        <tr><td><code>trim(text)</code></td><td>Strips whitespace</td><td><code>trim(  hi  )</code> → <code>hi</code></td></tr>
+        <tr><td><code>repeat_str(text, N)</code></td><td>Repeats text N times</td><td><code>repeat_str(ha, 3)</code> → <code>hahaha</code></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <footer>&copy; 2026 Fruzio Open Source &nbsp;·&nbsp; All parameters are comma-separated &nbsp;·&nbsp; Mint is built in C</footer>
+</main>
+</div>
+<script>
+const bar = document.getElementById('bar');
+window.addEventListener('scroll', () => {
+  bar.style.transform = `scaleX(${window.scrollY / (document.body.scrollHeight - innerHeight)})`;
+});
+const links = document.querySelectorAll('#nav a');
+new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      links.forEach(l => l.classList.remove('active'));
+      const a = document.querySelector(`#nav a[href="#${e.target.id}"]`);
+      if (a) a.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' }).observe || [...document.querySelectorAll('[id]')].forEach(s => {
+  new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`#nav a[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' }).observe(s);
+});
+[...document.querySelectorAll('[id]')].forEach(s => {
+  new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      links.forEach(l => l.classList.remove('active'));
+      const a = document.querySelector(`#nav a[href="#${e.target.id}"]`);
+      if (a) a.classList.add('active');
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' }).observe(s);
+});
+</script>
+</body>
+</html>

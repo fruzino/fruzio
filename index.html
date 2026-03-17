@@ -1,615 +1,2133 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mint</title>
-    <style>
-        :root {
-            --mint-green: #7baf62;
-            --mint-midgreen: rgb(81, 125, 60);
-            --mint-darkgreen: #324e25;
-            --bg-dark: #2f2c2b;
-            --bg-panel: #3d3d3d;
-            --text-light: #ccc;
-            --text-muted: #999;
-            --error: #ff0c0c;
-            --warn:#d8b52a;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-adsense-account" content="ca-pub-4768903876434099">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LSS88KSQDB"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
 
-        #ai-chat-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-        }
+    gtag('config', 'G-LSS88KSQDB');
+  </script>
+  <script src="https://analytics.ahrefs.com/analytics.js" data-key="EGBBBZIpESnVcXG1pcJCxg" async></script>
 
-        #ai-toggle {
-            background: var(--mint-green);
-            border: none;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            font-size: 24px;
-            color: blue;
-            transition: all ease 0.5s;
-        }   
+  <!-- ── PRIMARY SEO ── -->
+  <title>Mint — Open-Source Scripting Language by Fruzio</title>
+  <meta name="description"
+    content="Mint is a free, open-source scripting language built in C by Fruzio. Write clean scripts with AI, browser automation, media, dialogs, and a plugin system — no boilerplate. Download for Windows or try the browser playground.">
+  <meta name="keywords"
+    content="Mint scripting language, Fruzio, open source scripting language, C scripting language, embeddable scripting, Mint lang, browser automation scripting, AI scripting, Mint interpreter">
+  <meta name="author" content="Fruzio">
+  <link rel="canonical" href="https://fruzion.netlify.app">
+  <meta name="robots" content="index, follow">
 
-        #ai-toggle:hover {
+  <!-- ── OPEN GRAPH (social sharing + AI crawlers) ── -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://fruzion.netlify.app">
+  <meta property="og:title" content="Mint — Open-Source Scripting Language by Fruzio">
+  <meta property="og:description"
+    content="A free, lightweight scripting language built in C. AI, browser automation, media, UI dialogs, and a plugin system — out of the box. Try it in your browser.">
+  <meta property="og:site_name" content="Fruzion — Mint Scripting Language">
 
-            transform: scale(1.125) translateY(-10px);
+  <!-- ── TWITTER / X CARD ── -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Mint — Open-Source Scripting Language by Fruzio">
+  <meta name="twitter:description"
+    content="A free, open-source scripting language built in C. AI, browser automation, dialogs, plugins — no boilerplate. Download for Windows or try it live.">
+  <meta name="twitter:site" content="@fruzino">
 
-        }   
+  <!-- ── JSON-LD STRUCTURED DATA (search engines + AI models) ── -->
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Mint",
+  "alternateName": ["Mint scripting language", "Mint lang", "Fruzio Mint"],
+  "description": "A free, open-source scripting language built in C by Fruzio. Features include offline AI, browser automation, media playback, UI dialogs, a plugin system, and 30+ built-in commands.",
+  "url": "https://fruzion.netlify.app",
+  "downloadUrl": "https://github.com/fruzino/Mint/releases/tag/v1.4-beta",
+  "softwareVersion": "1.4.0-beta",
+  "releaseNotes": "https://github.com/fruzino/Mint/releases",
+  "author": {
+    "@type": "Person",
+    "name": "Fruzio",
+    "url": "https://fruzion.netlify.app"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Fruzio",
+    "url": "https://fruzion.netlify.app"
+  },
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows",
+  "programmingLanguage": "C",
+  "license": "https://github.com/fruzino/Mint/blob/main/LICENSE",
+  "codeRepository": "https://github.com/fruzino/Mint",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "keywords": "scripting language, open source, C, Mint, Fruzio, embeddable, AI scripting, browser automation, Windows scripting"
+}
+</script>
 
-        /* Chat Window Box */
-        #ai-window {
-            resize: both;          
-            overflow: hidden;      
-            min-width: 250px;      
-            min-height: 450px;
-            display: flex; /* Hidden by default */
-            width: 450px;
-            height: 450px;
-            background: var(--bg-panel);
-            border: 1px solid #444;
-            border-radius: 10px;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(20px) scale(0.95) scaleX(0.2) scaleY(0.01);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            transform-origin: bottom right;
-            flex-direction: column;
-            position: absolute;
-            bottom: 80px;
-            right: 0;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px); /* For Safari support */
-            
-            background: rgba(255, 255, 255, 0.2); 
-            
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --g: #7bda6a;
+      --g2: #4ea843;
+      --gg: rgba(123, 218, 106, 0.18);
+      --gg2: rgba(123, 218, 106, 0.06);
+      --bg: #111312;
+      --bg2: #181b18;
+      --bg3: #1e221e;
+      --b1: rgba(123, 218, 106, 0.13);
+      --b2: rgba(255, 255, 255, 0.06);
+      --tx: #d8e8d4;
+      --dm: #5a6e56;
+      --teal: #4ec9b0;
+      --or: #ce9178;
+      --bl: #6ab0f5;
+      --wn: #d8b52a;
+    }
 
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 15px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
 
-        #ai-window.active {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0) scale(1) scaleX(1) scaleY(1);
-        }
+    html {
+      scroll-behavior: smooth
+    }
 
-        /* Header Section */
-        .ai-header {
-            background: var(--mint-darkgreen, 0.2);
-            padding: 15px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px); /* For Safari support */
-            
-            background: rgb(81, 125, 60, 0.5); 
-            
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--tx);
+      line-height: 1.6;
+      overflow-x: hidden
+    }
 
-        .ai-header-close {
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-        }
+    /* ── HEADER ── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 5%;
+      height: 62px;
+      background: rgba(17, 19, 18, 0.95);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--b1);
+    }
 
-        /* Messages Area */
-        #ai-messages {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            font-size: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            
-        }
+    .logo-wrap {
+      display: flex;
+      flex-direction: column;
+      text-decoration: none
+    }
 
-        .ai-msg-bubble {
-            background: #333;
-            padding: 10px;
-            border-radius: 5px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px); /* For Safari support */
-            
-            background: rgba(255, 255, 255, 0.2); 
-            
+    .logo-sub {
+      font-size: 9px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: var(--dm)
+    }
 
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 15px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        }
+    .logo-main {
+      display: flex;
+      align-items: center;
+      gap: 7px
+    }
 
-        /* Input Area */
-        .ai-footer {
-            padding: 10px;
-            border-top: 1px solid #444;
-            display: flex;
-            gap: 5px;
-        }
+    .logo-main span {
+      font-family: 'DM Serif Display', serif;
+      font-size: 26px;
+      color: #fff;
+      line-height: 1
+    }
 
-        #ai-input {
-            flex: 1;
-            background: #222;
-            border: 1px solid #555;
-            color: white;
-            padding: 8px;
-            border-radius: 25px;
-        }
+    .logo-main img {
+      height: 24px
+    }
 
-        .ai-send-btn {
-            background: var(--mint-green, 0.2);
-            border: none;
-            color: white;
-            padding: 0 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px); /* For Safari support */
-            
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 4px
+    }
 
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 15px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2px
+    }
 
-        mark {
-            background-color: rgba(123, 175, 98, 0.4); /* Your mint green at 40% opacity */
-            color: #fff;
-            border-radius: 2px;
-            padding: 0 2px;
-        }
+    .nav-links a {
+      font-size: 13px;
+      color: var(--dm);
+      text-decoration: none;
+      padding: 6px 11px;
+      border-radius: 6px;
+      transition: color .15s, background .15s;
+      white-space: nowrap
+    }
 
-        #ai-messages h2, #ai-messages h3 {
-            color: var(--mint-green);
-            margin: 10px 0 5px 0;
-            font-size: 16px;
-        }
+    .nav-links a:hover {
+      color: var(--tx);
+      background: var(--gg2)
+    }
 
-        #ai-messages hr {
-            margin: 10px 0;
-            border-color: #555;
-        }
+    .nav-links a.hi {
+      color: var(--g);
+      border: 1px solid var(--b1)
+    }
 
-        body { 
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; 
-            margin: 0; 
-            background: var(--bg-dark); 
-            color: var(--text-light); 
-            line-height: 1.6;
-        }
+    .nav-links a.hi:hover {
+      background: var(--gg2)
+    }
 
-        /* Top Header */
-        header { 
-            padding: 20px 15%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between;
-        }
+    .ndiv {
+      width: 1px;
+      height: 20px;
+      background: var(--b2);
+      margin: 0 6px
+    }
 
-        .search-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    .sw {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-left: 4px
+    }
 
-        .search-input {
-            width: 200px;
-            background: #333;
-            border: 1px solid #444;
-            border-radius: 20px;
-            padding: 8px 15px;
-            color: white;
-            transition: width 0.4s ease, border-color 0.3s;
-        }
+    .sw img {
+      height: 16px;
+      opacity: .3
+    }
 
-        .header img {
-            align-self: baseline;
-            transition: transform 0.3s ease, filter 0.3s;
-        }
-        
-        .logo-container {
-            display: flex;
-            flex-direction: column; 
-            align-items: flex-start;
-            text-decoration: none;
-        }
+    .sw input {
+      background: var(--bg3);
+      border: 1px solid var(--b2);
+      border-radius: 8px;
+      padding: 6px 13px;
+      color: var(--tx);
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      width: 170px;
+      outline: none;
+      transition: border-color .2s
+    }
 
-        .logo-top { 
-            font-family: Georgia, serif;
-            font-size: 18px;
-            font-weight: bold; 
-            color: #fff;
-            line-height: 1;
-        }
+    .sw input:focus {
+      border-color: var(--g)
+    }
 
-        .logo-main { 
-            font-family: Georgia, serif;
-            font-size: 40px; 
-            font-weight: bold; 
-            color: #fff;
-            line-height: 1.1;
-            display: flex;
-            align-items: center;
-        }
+    /* ── HERO ── */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr minmax(300px, 420px);
+      align-items: center;
+      gap: clamp(24px, 4vw, 60px);
+      padding: clamp(40px, 6vh, 80px) 5% clamp(40px, 6vh, 72px);
+      min-height: calc(100vh - 62px);
+      position: relative;
+      overflow: hidden;
+    }
 
-        .logo span { color: var(--text-muted); font-weight: normal; margin-left: 10px; font-size: 20px; }
-        .logo img { height: 45px; margin-right: 10px; filter: grayscale(1) brightness(2); }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(123, 218, 106, 0.06) 1px, transparent 1px);
+      background-size: 30px 30px;
+      pointer-events: none;
+    }
 
-        .search-container input {
-            background: #444;
-            border: 1px solid #555;
-            padding: 8px 15px;
-            border-radius: 20px;
-            color: white;
-            width: 200px;
-        }
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: -5%;
+      left: 40%;
+      width: 55vw;
+      height: 55vw;
+      background: radial-gradient(ellipse, rgba(123, 218, 106, 0.07) 0%, transparent 65%);
+      pointer-events: none;
+    }
 
-        /* Hero / Intro Section */
-        .hero-container {
-            padding: 40px 15%;
-            display: grid;
-            grid-template-columns: 1.5fr 1fr;
-            gap: 50px;
-            background: #252525; /* Slightly darker texture area */
-        }
+    .hero-left {
+      position: relative;
+      z-index: 1;
+      min-width: 0
+    }
 
-        .hero-info h1 { font-size: 18px; color: var(--text-muted); font-weight: normal; }
-        .hero-info p { font-size: 22px; color: #aaa; margin-bottom: 20px; }
-        .hero-info b { color: var(--mint-green); }
-        .hero-head { font-size: 30px; color: var(--mint-green); text-align: center;}
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--g);
+      background: var(--gg2);
+      border: 1px solid var(--b1);
+      border-radius: 20px;
+      padding: 4px 14px;
+      margin-bottom: 20px;
+      letter-spacing: .05em;
+    }
 
-        .download-stack {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+    .eyebrow::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--g);
+      animation: pulse 2s infinite
+    }
 
-        .download-box {
-            background: var(--bg-panel);
-            padding: 30px;
-            border-radius: 5px;
-            text-align: center;
-            border: 1px solid #444;
-            height: fit-content;
-            transition: 
-                background 0.3s, 
-                box-shadow 0.3s,
-                transform 0.4s;
-        }
+    @keyframes pulse {
 
-        .download-box:hover {
-            background: #2c2c2c;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            transform: scale(1.05);
-        }
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1)
+      }
 
-        .md-icon {
-            filter: grayscale(1) brightness(2);
-        }
+      50% {
+        opacity: .4;
+        transform: scale(.75)
+      }
+    }
 
-        .version-tag { font-size: 24px; font-weight: bold; color: #fff; display: block; }
-        .release-notes { font-size: 12px; color: var(--mint-green); text-decoration: none; }
+    .hero-left h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(32px, 4.5vw, 66px);
+      line-height: 1.06;
+      color: #fff;
+      margin-bottom: 16px;
+    }
 
-        .btn-install {
-            display: block;
-            background: var(--mint-green);
-            color: white;
-            text-decoration: none;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
-            font-weight: bold;
-            font-size: 18px;
-            transition: 
-                background 0.2s,
-                transform 0.5s;
-        }
+    .hero-left h1 em {
+      font-style: italic;
+      color: var(--g)
+    }
 
-        .btn-install:hover {
-            background-color: #345026;
-            transform: scale(1.05);
-        }
+    .hero-sub {
+      font-size: clamp(14px, 1.5vw, 16px);
+      color: var(--dm);
+      max-width: 460px;
+      margin-bottom: 28px;
+      line-height: 1.75
+    }
 
-        .old-btn-install {
-            display: block;
-            background: var(--mint-midgreen);
-            color: white;
-            text-decoration: none;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 45px;
-            font-weight: bold;
-            font-size: 18px;
-            transition: 
-                background 0.2s,
-                transform 0.5s;
-        }
+    .hero-sub b {
+      color: var(--tx);
+      font-weight: 500
+    }
 
-        .old-btn-install:hover {
-            background-color: var(--mint-darkgreen);
-            transform: scale(1.05);
-        }
+    .hero-btns {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap
+    }
 
-        /* Icon Grid */
-        .main-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 40px;
-            padding: 60px 15%;
-        }
+    .btn-p {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--g);
+      color: #0c180a;
+      padding: 12px 22px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      text-decoration: none;
+      transition: background .2s, transform .2s, box-shadow .2s
+    }
 
-        .grid-item { display: flex; gap: 20px; }
-        .grid-item .icon { 
-            width: 60px; height: 60px; 
-            background: #444; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            font-size: 24px;
-        }
+    .btn-p:hover {
+      background: #90ee80;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(123, 218, 106, .28)
+    }
 
-        .grid-content h3 { margin: 0; color: #fff; font-size: 18px; }
-        .grid-content p { font-size: 13px; color: #888; margin: 5px 0; }
-        .grid-content a { color: var(--mint-green); text-decoration: none; font-size: 13px; }
+    .btn-s {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: transparent;
+      color: var(--tx);
+      padding: 12px 22px;
+      border-radius: 8px;
+      font-weight: 500;
+      font-size: 14px;
+      text-decoration: none;
+      border: 1px solid var(--b2);
+      transition: border-color .2s, background .2s, transform .2s
+    }
 
-        hr { border: 0; border-top: 1px solid #444; margin: 0 15%; }
-    </style>
+    .btn-s:hover {
+      border-color: var(--b1);
+      background: var(--gg2);
+      transform: translateY(-2px)
+    }
+
+    /* terminal */
+    .hero-right {
+      position: relative;
+      z-index: 1;
+      min-width: 0
+    }
+
+    .terminal {
+      background: #0b0d0b;
+      border: 1px solid var(--b1);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, .7)
+    }
+
+    .term-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 11px 15px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--b2)
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%
+    }
+
+    .dot:nth-child(1) {
+      background: #ff5f57
+    }
+
+    .dot:nth-child(2) {
+      background: #febc2e
+    }
+
+    .dot:nth-child(3) {
+      background: #28c840
+    }
+
+    .term-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--dm);
+      margin: 0 auto
+    }
+
+    .term-body {
+      padding: 18px 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(11px, 1.1vw, 13px);
+      line-height: 1.9
+    }
+
+    .tc {
+      color: var(--dm)
+    }
+
+    .tg {
+      color: var(--g)
+    }
+
+    .to {
+      color: var(--or)
+    }
+
+    .tt {
+      color: var(--teal)
+    }
+
+    .tw {
+      color: var(--tx)
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 7px;
+      height: 13px;
+      background: var(--g);
+      vertical-align: middle;
+      animation: blink 1.1s step-end infinite
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0
+      }
+    }
+
+    /* ── STATS ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid var(--b1);
+      border-bottom: 1px solid var(--b1);
+      background: var(--bg2)
+    }
+
+    .stat {
+      padding: 24px 16px;
+      text-align: center;
+      border-right: 1px solid var(--b1)
+    }
+
+    .stat:last-child {
+      border-right: none
+    }
+
+    .stat-n {
+      font-family: 'DM Serif Display', serif;
+      font-size: 28px;
+      color: var(--g);
+      line-height: 1
+    }
+
+    .stat-l {
+      font-size: 11px;
+      color: var(--dm);
+      margin-top: 4px;
+      letter-spacing: .04em
+    }
+
+    /* ── QUICK LINKS ── */
+    .quicklinks {
+      padding: 44px 5%;
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--b1)
+    }
+
+    .ql {
+      flex: 1;
+      min-width: 180px;
+      background: var(--bg2);
+      border: 1px solid var(--b2);
+      border-radius: 10px;
+      padding: 20px;
+      text-decoration: none;
+      display: flex;
+      align-items: flex-start;
+      gap: 13px;
+      transition: border-color .2s, box-shadow .2s, transform .2s
+    }
+
+    .ql:hover {
+      border-color: var(--b1);
+      box-shadow: 0 0 0 1px var(--gg), 0 6px 24px rgba(0, 0, 0, .4);
+      transform: translateY(-3px)
+    }
+
+    .ql-ico {
+      font-size: 20px;
+      flex-shrink: 0;
+      margin-top: 2px
+    }
+
+    .ql h3 {
+      font-size: 13px;
+      color: #fff;
+      font-weight: 600;
+      margin-bottom: 3px
+    }
+
+    .ql p {
+      font-size: 12px;
+      color: var(--dm);
+      line-height: 1.5
+    }
+
+    .ql span {
+      display: block;
+      font-size: 10px;
+      color: var(--g);
+      margin-top: 7px;
+      font-family: 'JetBrains Mono', monospace
+    }
+
+    /* ── FEATURES CAROUSEL ── */
+    .features {
+      padding: 64px 5% 0
+    }
+
+    .sec-ey {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--g);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      margin-bottom: 8px
+    }
+
+    .sec-t {
+      font-family: 'DM Serif Display', serif;
+      font-size: 30px;
+      color: #fff;
+      margin-bottom: 6px
+    }
+
+    .sec-s {
+      font-size: 14px;
+      color: var(--dm);
+      max-width: 480px;
+      margin-bottom: 32px
+    }
+
+    .carousel-wrap {
+      position: relative
+    }
+
+    /* fade edges */
+    .carousel-wrap::before,
+    .carousel-wrap::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 20px;
+      width: 60px;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .carousel-wrap::before {
+      left: 0;
+      background: linear-gradient(to right, var(--bg), transparent)
+    }
+
+    .carousel-wrap::after {
+      right: 0;
+      background: linear-gradient(to left, var(--bg), transparent)
+    }
+
+    .feat-scroll {
+      display: flex;
+      gap: 14px;
+      overflow-x: auto;
+      padding: 4px 4px 20px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      /* custom scrollbar */
+      scrollbar-width: thin;
+      scrollbar-color: var(--g2) var(--bg3);
+    }
+
+    .feat-scroll::-webkit-scrollbar {
+      height: 5px
+    }
+
+    .feat-scroll::-webkit-scrollbar-track {
+      background: var(--bg3);
+      border-radius: 10px
+    }
+
+    .feat-scroll::-webkit-scrollbar-thumb {
+      background: linear-gradient(to right, var(--g2), var(--g));
+      border-radius: 10px
+    }
+
+    .feat-scroll::-webkit-scrollbar-thumb:hover {
+      background: var(--g)
+    }
+
+    .fc {
+      flex: 0 0 clamp(200px, 22vw, 260px);
+      scroll-snap-align: start;
+      background: var(--bg2);
+      border: 1px solid var(--b2);
+      border-radius: 10px;
+      padding: 22px;
+      transition: border-color .2s, box-shadow .2s, transform .2s;
+    }
+
+    .fc:hover {
+      border-color: var(--b1);
+      box-shadow: 0 0 0 1px var(--gg), 0 6px 28px rgba(0, 0, 0, .4);
+      transform: translateY(-3px)
+    }
+
+    .fc-ico {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: var(--gg2);
+      border: 1px solid var(--b1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      margin-bottom: 13px
+    }
+
+    .fc h3 {
+      font-size: 13px;
+      color: #fff;
+      font-weight: 600;
+      margin-bottom: 5px
+    }
+
+    .fc p {
+      font-size: 12px;
+      color: var(--dm);
+      line-height: 1.6
+    }
+
+    .fc a {
+      color: var(--g);
+      text-decoration: none;
+      font-size: 11px;
+      margin-top: 9px;
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace
+    }
+
+    .fc a:hover {
+      text-decoration: underline
+    }
+
+    .fc code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--or);
+      background: rgba(206, 145, 120, .08);
+      padding: 1px 4px;
+      border-radius: 3px;
+      border: 1px solid rgba(206, 145, 120, .12)
+    }
+
+    /* scroll hint arrows */
+    .scroll-hint {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      margin-bottom: 52px
+    }
+
+    .sh-btn {
+      background: var(--bg2);
+      border: 1px solid var(--b2);
+      color: var(--dm);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: border-color .2s, color .2s
+    }
+
+    .sh-btn:hover {
+      border-color: var(--b1);
+      color: var(--g)
+    }
+
+    .sh-label {
+      font-size: 11px;
+      color: var(--dm);
+      font-family: 'JetBrains Mono', monospace
+    }
+
+    /* ── INSTALL (now ABOVE download) ── */
+    .setup {
+      padding: 64px 5%;
+      background: var(--bg2);
+      border-top: 1px solid var(--b1);
+      border-bottom: 1px solid var(--b1)
+    }
+
+    .steps {
+      display: flex;
+      flex-direction: column;
+      margin-top: 32px;
+      max-width: 600px
+    }
+
+    .step {
+      display: flex;
+      gap: 18px;
+      position: relative
+    }
+
+    .step::before {
+      content: '';
+      position: absolute;
+      left: 17px;
+      top: 40px;
+      bottom: 0;
+      width: 1px;
+      background: var(--b1)
+    }
+
+    .step:last-child::before {
+      display: none
+    }
+
+    .step-n {
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: var(--gg2);
+      border: 1px solid var(--b1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--g);
+      font-weight: 700;
+      position: relative;
+      z-index: 1
+    }
+
+    .step-c {
+      padding-bottom: 28px
+    }
+
+    .step-c h4 {
+      font-size: 14px;
+      color: #fff;
+      font-weight: 600;
+      margin-bottom: 4px
+    }
+
+    .step-c p {
+      font-size: 13px;
+      color: var(--dm);
+      line-height: 1.6
+    }
+
+    .step-c code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--or);
+      background: rgba(206, 145, 120, .08);
+      padding: 1px 4px;
+      border-radius: 3px;
+      border: 1px solid rgba(206, 145, 120, .12)
+    }
+
+    /* ── DOWNLOAD ── */
+    .dl-sec {
+      padding: 64px 5%
+    }
+
+    .dl-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+      margin-top: 32px
+    }
+
+    .dl-card {
+      background: var(--bg2);
+      border: 1px solid var(--b2);
+      border-radius: 10px;
+      padding: 24px;
+      transition: border-color .2s, box-shadow .2s
+    }
+
+    .dl-card:hover {
+      border-color: var(--b1);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, .4)
+    }
+
+    .dl-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 12px
+    }
+
+    .dl-badge.new {
+      background: rgba(123, 218, 106, .09);
+      color: var(--g);
+      border: 1px solid var(--b1)
+    }
+
+    .dl-badge.old {
+      background: rgba(216, 181, 42, .07);
+      color: var(--wn);
+      border: 1px solid rgba(216, 181, 42, .2)
+    }
+
+    .dl-card h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px;
+      color: #fff;
+      margin-bottom: 3px
+    }
+
+    .dl-ver {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--dm);
+      margin-bottom: 16px
+    }
+
+    .dl-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      width: 100%;
+      padding: 11px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all .2s;
+      margin-bottom: 8px
+    }
+
+    .dl-btn.pri {
+      background: var(--g);
+      color: #0c180a
+    }
+
+    .dl-btn.pri:hover {
+      background: #90ee80
+    }
+
+    .dl-btn.gh {
+      background: transparent;
+      color: var(--tx);
+      border: 1px solid var(--b2)
+    }
+
+    .dl-btn.gh:hover {
+      background: var(--gg2);
+      border-color: var(--b1)
+    }
+
+    .dl-note {
+      font-size: 11px;
+      color: var(--dm);
+      text-align: center;
+      margin-top: 5px
+    }
+
+    .dl-note a {
+      color: var(--g);
+      text-decoration: none
+    }
+
+    /* ── AI CHAT ── */
+    #aic {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      z-index: 1000
+    }
+
+    #ait {
+      background: var(--g);
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(123, 218, 106, .4);
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform .3s, box-shadow .3s
+    }
+
+    #ait:hover {
+      transform: scale(1.1) translateY(-3px);
+      box-shadow: 0 8px 32px rgba(123, 218, 106, .55)
+    }
+
+    #aiw {
+      position: absolute;
+      bottom: 64px;
+      right: 0;
+      width: 330px;
+      height: 440px;
+      background: var(--bg2);
+      border: 1px solid var(--b1);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .7);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(14px) scale(0.97);
+      transform-origin: bottom right;
+      transition: all .22s cubic-bezier(.4, 0, .2, 1)
+    }
+
+    #aiw.on {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1)
+    }
+
+    .aih {
+      padding: 12px 14px;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--b1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .aih-t {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--tx)
+    }
+
+    .aih-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--g);
+      animation: pulse 2s infinite
+    }
+
+    .aih-x {
+      background: none;
+      border: none;
+      color: var(--dm);
+      cursor: pointer;
+      font-size: 17px;
+      line-height: 1;
+      transition: color .15s
+    }
+
+    .aih-x:hover {
+      color: var(--tx)
+    }
+
+    #aim {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--b2) transparent
+    }
+
+    .ab {
+      padding: 9px 12px;
+      border-radius: 9px;
+      font-size: 13px;
+      line-height: 1.6;
+      max-width: 92%
+    }
+
+    .ab.bot {
+      background: var(--bg3);
+      border: 1px solid var(--b2);
+      color: var(--tx);
+      align-self: flex-start
+    }
+
+    .ab.usr {
+      background: rgba(123, 218, 106, .11);
+      border: 1px solid var(--b1);
+      color: var(--tx);
+      align-self: flex-end
+    }
+
+    .aif {
+      padding: 9px;
+      border-top: 1px solid var(--b1);
+      display: flex;
+      gap: 7px
+    }
+
+    #aii {
+      flex: 1;
+      background: var(--bg3);
+      border: 1px solid var(--b2);
+      color: var(--tx);
+      padding: 8px 12px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color .2s
+    }
+
+    #aii:focus {
+      border-color: var(--g)
+    }
+
+    .ais {
+      background: var(--g);
+      border: none;
+      color: #0c180a;
+      width: 34px;
+      height: 34px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .2s, transform .15s
+    }
+
+    .ais:hover {
+      background: #90ee80;
+      transform: scale(1.05)
+    }
+
+    .donate-sec {
+      padding: 70px 5%;
+      border-top: 1px solid var(--b1);
+      background: var(--bg);
+    }
+
+    .donate-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    .donate-card {
+      background: var(--bg2);
+      border: 1px solid var(--b2);
+      border-radius: 10px;
+      padding: 26px;
+      transition: .25s;
+    }
+
+    .donate-card:hover {
+      border-color: var(--b1);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, .4);
+    }
+
+    .donate-card h3 {
+      font-family: 'DM Serif Display', serif;
+      margin-bottom: 6px;
+      color: #fff;
+    }
+
+    .donate-card p {
+      font-size: 13px;
+      color: var(--dm);
+      margin-bottom: 16px;
+    }
+
+    .donate-amounts {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .amt {
+      background: var(--bg3);
+      border: 1px solid var(--b2);
+      color: var(--tx);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: .2s;
+    }
+
+    .amt:hover {
+      border-color: var(--g);
+      color: var(--g);
+    }
+
+    .donate-note {
+      font-size: 11px;
+      color: var(--dm);
+      margin-top: 8px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 28px 5%;
+      border-top: 1px solid var(--b1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--dm)
+    }
+
+    footer a {
+      color: var(--g);
+      text-decoration: none
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 18px
+    }
+
+    mark {
+      background: rgba(123, 218, 106, .22);
+      color: #fff;
+      border-radius: 2px;
+      padding: 0 2px
+    }
+
+    /* ── ANIMATIONS ── */
+
+    /* scroll progress bar */
+    #prog {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      width: 0%;
+      background: linear-gradient(to right, var(--g2), var(--g), #a8f59a);
+      z-index: 999;
+      transition: width .1s linear;
+      box-shadow: 0 0 8px var(--g)
+    }
+
+    /* particle canvas */
+    #particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: .5
+    }
+
+    /* hero enters */
+    .hero-left {
+      animation: heroIn .9s cubic-bezier(.16, 1, .3, 1) both
+    }
+
+    .hero-right {
+      animation: termIn 1.1s cubic-bezier(.16, 1, .3, 1) .2s both
+    }
+
+    @keyframes heroIn {
+      from {
+        opacity: 0;
+        transform: translateY(28px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    @keyframes termIn {
+      from {
+        opacity: 0;
+        transform: translateY(36px) scale(.97)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1)
+      }
+    }
+
+    /* header slides down */
+    header {
+      animation: hdrIn .6s cubic-bezier(.16, 1, .3, 1) both
+    }
+
+    @keyframes hdrIn {
+      from {
+        opacity: 0;
+        transform: translateY(-100%)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    /* terminal float */
+    .terminal {
+      animation: termFloat 5s ease-in-out infinite .8s
+    }
+
+    @keyframes termFloat {
+
+      0%,
+      100% {
+        transform: translateY(0)
+      }
+
+      50% {
+        transform: translateY(-8px)
+      }
+    }
+
+    /* terminal glow pulse */
+    .terminal {
+      transition: box-shadow .4s
+    }
+
+    .terminal:hover {
+      animation: none;
+      box-shadow: 0 0 0 1px var(--g), 0 24px 64px rgba(0, 0, 0, .7), 0 0 40px rgba(123, 218, 106, .12) !important
+    }
+
+    /* stat counters fade up */
+    .stat {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity .5s, transform .5s
+    }
+
+    .stat.vis {
+      opacity: 1;
+      transform: translateY(0)
+    }
+
+    /* reveal on scroll — base state */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity .6s cubic-bezier(.16, 1, .3, 1), transform .6s cubic-bezier(.16, 1, .3, 1)
+    }
+
+    .reveal.vis {
+      opacity: 1;
+      transform: translateY(0)
+    }
+
+    /* stagger children */
+    .stagger>* {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity .5s cubic-bezier(.16, 1, .3, 1), transform .5s cubic-bezier(.16, 1, .3, 1)
+    }
+
+    .stagger.vis>*:nth-child(1) {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: .05s
+    }
+
+    .stagger.vis>*:nth-child(2) {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: .12s
+    }
+
+    .stagger.vis>*:nth-child(3) {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: .19s
+    }
+
+    .stagger.vis>*:nth-child(4) {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: .26s
+    }
+
+    /* step reveal */
+    .step {
+      opacity: 0;
+      transform: translateX(-18px);
+      transition: opacity .5s, transform .5s
+    }
+
+    .step.vis {
+      opacity: 1;
+      transform: translateX(0)
+    }
+
+    .step:nth-child(1) {
+      transition-delay: .05s
+    }
+
+    .step:nth-child(2) {
+      transition-delay: .18s
+    }
+
+    .step:nth-child(3) {
+      transition-delay: .31s
+    }
+
+    /* step number ping on reveal */
+    .step.vis .step-n::after {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 1px solid var(--g);
+      opacity: 0;
+      animation: ping .7s ease-out .4s forwards;
+    }
+
+    @keyframes ping {
+      from {
+        opacity: .6;
+        transform: scale(1)
+      }
+
+      to {
+        opacity: 0;
+        transform: scale(1.6)
+      }
+    }
+
+    /* dl-card slide up */
+    .dl-card {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity .5s, transform .5s, border-color .2s, box-shadow .2s
+    }
+
+    .dl-card.vis {
+      opacity: 1;
+      transform: translateY(0)
+    }
+
+    .dl-card:nth-child(2) {
+      transition-delay: .14s
+    }
+
+    /* feature cards pop in when carousel is in view */
+    .fc {
+      opacity: 0;
+      transform: translateY(18px) scale(.97);
+      transition: opacity .4s, transform .4s, border-color .2s, box-shadow .2s
+    }
+
+    .fc.vis {
+      opacity: 1;
+      transform: translateY(0) scale(1)
+    }
+
+    /* quick link cards */
+    .ql {
+      transition: border-color .2s, box-shadow .2s, transform .3s, opacity .5s
+    }
+
+    /* ripple on buttons */
+    .btn-p,
+    .btn-s,
+    .dl-btn {
+      position: relative;
+      overflow: hidden
+    }
+
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .22);
+      transform: scale(0);
+      animation: rippleAnim .55s linear;
+      pointer-events: none
+    }
+
+    @keyframes rippleAnim {
+      to {
+        transform: scale(4);
+        opacity: 0
+      }
+    }
+
+    /* hero eyebrow shimmer */
+    .eyebrow {
+      background-size: 200% auto;
+      background-image: linear-gradient(120deg, var(--gg2) 0%, rgba(123, 218, 106, .14) 50%, var(--gg2) 100%);
+      animation: shimmer 3s linear infinite, pulse 2s infinite
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: 200% center
+      }
+
+      100% {
+        background-position: -200% center
+      }
+    }
+
+    /* section heading underline draw */
+    .sec-t {
+      position: relative;
+      display: inline-block
+    }
+
+    .sec-t::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -4px;
+      height: 2px;
+      width: 0;
+      background: linear-gradient(to right, var(--g2), var(--g));
+      border-radius: 2px;
+      transition: width .7s cubic-bezier(.16, 1, .3, 1)
+    }
+
+    .sec-t.vis::after {
+      width: 100%
+    }
+
+    /* dot grid subtle drift */
+    .hero::before {
+      animation: gridDrift 20s linear infinite
+    }
+
+    @keyframes gridDrift {
+      0% {
+        background-position: 0 0
+      }
+
+      100% {
+        background-position: 30px 30px
+      }
+    }
+
+    /* glow orb drift */
+    .hero::after {
+      animation: orbDrift 12s ease-in-out infinite alternate
+    }
+
+    @keyframes orbDrift {
+      0% {
+        transform: translateY(0) scale(1)
+      }
+
+      100% {
+        transform: translateY(-40px) scale(1.08)
+      }
+    }
+
+    /* responsive */
+    @media(max-width:860px) {
+      .hero {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        padding: 48px 5%
+      }
+
+      .hero-right {
+        display: none
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .stat:nth-child(2) {
+        border-right: none
+      }
+
+      .stat:nth-child(3) {
+        border-top: 1px solid var(--b1)
+      }
+    }
+
+    @media(max-width:540px) {
+      .nav-links a:not(.hi) {
+        display: none
+      }
+
+      .sw input {
+        width: 120px
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr)
+      }
+    }
+  </style>
 </head>
+
 <body>
+  <div id="prog"></div>
+  <canvas id="particles"></canvas>
 
-<header class="search-group">
-    <a href="index.html" class="logo-container">
-        <span class="logo-top">Fruzio</span>
-        <div class="logo-main">
-            Mint <img src="Mint.png" alt="leaf" style="height: 50px; margin-left: 5px;">
-        </div>
-    </a>    
-    <div class="search-container">
-        <img src="Search.png" alt="" height="30" class="search-icon"><input class="search-input" type="text" placeholder="Search...">
+  <header>
+    <a href="index.html" class="logo-wrap">
+      <span class="logo-sub">Fruzio</span>
+      <div class="logo-main"><span>Mint</span><img src="Mint.png" alt="Mint scripting language logo"></div>
+    </a>
+    <div class="header-right">
+      <div class="nav-links">
+        <a href="commands.html" class="hi">&#128214; Commands</a>
+        <a href="devapi.html" class="hi">&#9881;&#65039; Dev API</a>
+        <div class="ndiv"></div>
+        <a href="playground.html" class="hi">&#9654; Playground</a>
+        <div class="ndiv"></div>
+        <a href="https://github.com/fruzino/Mint">GitHub</a>
+        <a href="#download">Download</a>
+      </div>
+      <div class="sw">
+        <img src="Search.png" alt="Search">
+        <input class="search-input" type="text" placeholder="Search...">
+      </div>
     </div>
-</header>
+  </header>
 
-<div class="hero-container">
-    <div class="hero-info">
-        <h3 class="hero-head">About</h3>
-        <p>Mint is a <b>open-source</b> programming language</p>
-        <p>Mint is <b>FREE</b> to use, so no need to worry about paying for anything!!</p>
-        <div class="hero-details">
-            <h3 class="hero-head">Installation</h3>
-            <hr color="white">
-            <p>1. Install the zip file and the (version).vsix extension as well.</p>
-            <br>
-            <p>2. Place it in a safe area.</p>
-            <br>
-            <p>3. Run the mod.bat, setup.bat as administrator and let it do the rest!</p>
-         </div>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <div class="eyebrow">v1.5.0 &nbsp;&middot;&nbsp; Open Source</div>
+      <h1>Scripting that<br>feels <em>natural</em></h1>
+      <p class="hero-sub">
+        Mint is a <b>free, open-source</b> scripting language built in C by Fruzio.
+        Write clean scripts with AI, browser automation, media, UI dialogs,
+        and a plugin system &mdash; no boilerplate.
+      </p>
+      <div class="hero-btns">
+        <a href="https://github.com/fruzino/Mint/releases/tag/v1.5" class="btn-p">&#8659;&nbsp; Download for Windows</a>
+        <a href="commands.html" class="btn-s">&#8594;&nbsp; Browse Commands</a>
+      </div>
     </div>
-    
-    <div class="download-stack">
-        <div class="download-box">
-            <span class="version-tag"><img src="Mint.png" alt="" height="50" class="md-icon">Latest build 1.4.0-beta</span>
-            <a href="https://github.com/limesuggestbox360-art/Mint" class="release-notes">Read Manual(Recommended)</a>
-            <a href="https://github.com/fruzino/Mint/releases/tag/v1.4-beta" class="btn-install">Download for Windows(AMD)</a>
-            <div class="o-download-box">
-                <a href="https://github.com/limesuggestbox360-art/Mint/releases" class="old-btn-install">View all versions</a>
-            </div>
+    <div class="hero-right">
+      <div class="terminal">
+        <div class="term-bar">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <span class="term-title">sample.mint</span>
         </div>
-
-        <div class="download-box">
-            <span class="version-tag" style="color: var(--warn);"><img src="Mint.png" alt="" height="50" class="md-icon">(Legacy) Build 1.0.2</span>
-            <a href="https://github.com/limesuggestbox360-art/Mint" class="release-notes">Read Manual(Recommended)</a>
-            <a href="https://github.com/limesuggestbox360-art/Mint/releases/tag/v1" class="btn-install">Download for Windows(AMD)</a>
-            <div class="o-download-box">
-                <a href="https://github.com/limesuggestbox360-art/Mint/releases" class="old-btn-install">View all versions</a>
-            </div>
+        <div class="term-body">
+          <span class="tc"># variables</span><br>
+          <span class="tg">name</span> <span class="tw">= Alice</span><br>
+          <span class="tt">write</span><span class="tw">(Hello, </span><span class="tg">@name</span><span
+            class="tw">!)</span><br>
+          <br>
+          <span class="tc"># list + loop</span><br>
+          <span class="tt">list.new</span><span class="tw">(items)</span><br>
+          <span class="tt">list.add</span><span class="tw">(items, apple)</span><br>
+          <span class="tt">list.add</span><span class="tw">(items, banana)</span><br>
+          <span class="tt">list.len</span><span class="tw">(items)</span><br>
+          <span class="tt">write</span><span class="tw">(count: </span><span class="tg">@_</span><span
+            class="tw">)</span><br>
+          <br>
+          <span class="tc"># offline AI</span><br>
+          <span class="tt">tinyai</span><span class="tw">(Describe </span><span class="tg">@name</span><span
+            class="tw">, r, .default, .default)</span><br>
+          <span class="tt">write</span><span class="tw">(</span><span class="tg">@r</span><span class="tw">)</span><br>
+          <br>
+          <span class="tc"># browser</span><br>
+          <span class="tt">browser</span><span class="tw">(chrome)</span><br>
+          <span class="tt">website</span><span class="tw">(https://example.com)</span><br>
+          <br>
+          <span class="tc"># dialog</span><br>
+          <span class="tt">dialog</span><span class="tw">(info, Done!, Script finished)</span><br>
+          <span class="cursor"></span>
         </div>
+      </div>
     </div>
-</div>
+  </section>
 
-<hr>
-
-<div class="main-grid">
-    <div class="grid-item">
-        <div class="icon">⚙️</div>
-        <div class="grid-content">
-            <h3>About</h3>
-            <p>Fast syntax and lightweight core.</p>
-        </div>
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat" data-count="C">
+      <div class="stat-n">C</div>
+      <div class="stat-l">Native interpreter</div>
     </div>
-    <div class="grid-item">
-        <div class="icon">📖</div>
-        <div class="grid-content">
-            <h3>Learn</h3>
-            <a href="document.html">Documentaries & Tutorial</a>
-        </div>
+    <div class="stat" data-count="14+">
+      <div class="stat-n">0</div>
+      <div class="stat-l">List commands</div>
     </div>
-    <div class="grid-item">
-        <div class="icon">🛠️</div>
-        <div class="grid-content">
-            <h3>Tools</h3>
-            <a href="developer.html">How to create custom modules</a>
-        </div>
+    <div class="stat" data-count="3">
+      <div class="stat-n">0</div>
+      <div class="stat-l">AI backends</div>
     </div>
-    <div class="grid-item">
-        <div class="icon"><img src="github.png" alt="" height="35"></div>
-        <div class="grid-content">
-            <h3>Community</h3>
-            <a href="">Get involved in the community</a>
-        </div>
+    <div class="stat" data-count="Free">
+      <div class="stat-n">Free</div>
+      <div class="stat-l">Open source forever</div>
     </div>
-</div>
+  </div>
 
-<div id="ai-chat-container">
-    <button id="ai-toggle">✨</button>
-    
-    <div id="ai-window">
-        <div class="ai-header">
-            <span>Mint AI Helper</span>
-            <button onclick="toggleChat()" class="ai-header-close">✕</button>
+  <!-- QUICK LINKS -->
+  <div class="quicklinks stagger">
+    <a href="commands.html" class="ql">
+      <div class="ql-ico">&#128214;</div>
+      <div>
+        <h3>Command Reference</h3>
+        <p>All 30+ built-in commands with parameters and examples.</p><span>commands.html &rarr;</span>
+      </div>
+    </a>
+    <a href="devapi.html" class="ql">
+      <div class="ql-ico">&#9881;&#65039;</div>
+      <div>
+        <h3>Developer API</h3>
+        <p>Build plugins, understand the C architecture and helper scripts.</p><span>devapi.html &rarr;</span>
+      </div>
+    </a>
+    <a href="devapi.html#plugin-structure" class="ql">
+      <div class="ql-ico">&#129520;</div>
+      <div>
+        <h3>Plugin Guide</h3>
+        <p>Drop a folder in plugins\ and add new commands with zero recompile.</p><span>devapi.html#plugins
+          &rarr;</span>
+      </div>
+    </a>
+    <a href="https://github.com/fruzino/Mint" class="ql">
+      <div class="ql-ico"><img src="github.png" alt="GitHub" style="height:20px;filter:brightness(2)"></div>
+      <div>
+        <h3>GitHub</h3>
+        <p>Source code, issues, releases, and the VS Code extension.</p><span>github.com/fruzino/Mint &rarr;</span>
+      </div>
+    </a>
+  </div>
+
+  <!-- FEATURES CAROUSEL -->
+  <section class="features">
+    <div class="sec-ey reveal">What's inside</div>
+    <h2 class="sec-t reveal">Everything you need</h2>
+    <p class="sec-s reveal">A complete scripting toolkit out of the box. Scroll to explore all features.</p>
+    <div class="carousel-wrap">
+      <div class="feat-scroll" id="fs">
+        <div class="fc">
+          <div class="fc-ico">&#9881;&#65039;</div>
+          <h3>C-native Speed</h3>
+          <p>Compiled from a single <code>mint.c</code>. Fast startup, low memory, runs anywhere MinGW does.</p>
         </div>
-        
-        <div id="ai-messages">
-            <div class="ai-msg-bubble">Hi! Ask me about <b>Mint</b> syntax or setup.</div>
+        <div class="fc">
+          <div class="fc-ico">&#129504;</div>
+          <h3>AI Built In</h3>
+          <p>Call <code>tinyai()</code> for fully offline LLM, or <code>ai()</code> / <code>llm()</code> for cloud. Just
+            drop in a model file.</p>
+          <a href="commands.html#ai-section">AI commands &rarr;</a>
         </div>
-        
-        <div class="ai-footer">
-            <input type="text" id="ai-input" placeholder="How do I use mod.bat?">
-            <button onclick="askAI()" class="ai-send-btn">Send</button>
+        <div class="fc">
+          <div class="fc-ico">&#128202;</div>
+          <h3>Lists &amp; Data</h3>
+          <p>14 built-in list commands. <code>add</code>, <code>get</code>, <code>pop</code>, <code>join</code>,
+            <code>reverse</code>. Results stored in <code>@_</code> automatically.</p>
+          <a href="commands.html#lists">List commands &rarr;</a>
         </div>
+        <div class="fc">
+          <div class="fc-ico">&#127760;</div>
+          <h3>Browser Automation</h3>
+          <p>Drive Chrome with <code>browser()</code>. Navigate, <code>click()</code>, <code>type()</code>, and scrape
+            text with <code>gettext()</code>.</p>
+          <a href="commands.html#browser-section">Browser commands &rarr;</a>
+        </div>
+        <div class="fc">
+          <div class="fc-ico">&#127911;</div>
+          <h3>Media Playback</h3>
+          <p>Play audio and video via VLC. <code>playsound()</code>, <code>video()</code>, <code>vvolume()</code>,
+            <code>vseek()</code> and more.</p>
+          <a href="commands.html#media">Media commands &rarr;</a>
+        </div>
+        <div class="fc">
+          <div class="fc-ico">&#128172;</div>
+          <h3>UI Dialogs</h3>
+          <p>Real native OS popups. <code>dialog(info)</code>, <code>dialog(error)</code>, <code>dialog(yesno)</code>
+            via tkinter.</p>
+          <a href="commands.html#ui">Dialog commands &rarr;</a>
+        </div>
+        <div class="fc">
+          <div class="fc-ico">&#129520;</div>
+          <h3>Plugin System</h3>
+          <p>Drop a folder into <code>plugins\</code> with a <code>Plugin.py</code> and manifest. New commands load at
+            startup.</p>
+          <a href="devapi.html#plugin-structure">Build a plugin &rarr;</a>
+        </div>
+        <div class="fc">
+          <div class="fc-ico">&#128196;</div>
+          <h3>File &amp; System</h3>
+          <p><code>file()</code>, <code>run()</code>, <code>locate()</code>, <code>sys()</code> for reading, writing,
+            executing and searching files.</p>
+          <a href="commands.html#files">File commands &rarr;</a>
+        </div>
+        <div class="fc">
+          <div class="fc-ico">&#128260;</div>
+          <h3>Control Flow</h3>
+          <p><code>if()</code>, <code>while()</code>, <code>repeat()</code> with <code>and/or/not/nand/nor</code> logic.
+            Multi-line blocks and semicolons.</p>
+          <a href="commands.html#logic">Logic commands &rarr;</a>
+        </div>
+        <div class="fc">
+          <div class="fc-ico">&#128187;</div>
+          <h3>VS Code Extension</h3>
+          <p>Syntax highlighting for <code>.mint</code> files. Install the <code>.vsix</code> from the release page
+            alongside the interpreter.</p>
+          <a href="https://github.com/fruzino/Mint/releases/tag/v1.4-beta">Get extension &rarr;</a>
+        </div>
+      </div>
     </div>
-</div>
+    <div class="scroll-hint">
+      <button class="sh-btn" id="sl">&#8592;</button>
+      <button class="sh-btn" id="sr">&#8594;</button>
+      <span class="sh-label">scroll to see all features</span>
+    </div>
+  </section>
 
-<script>
+  <!-- INSTALLATION (before download) -->
+  <section class="setup" id="install">
+    <div class="sec-ey reveal">Installation</div>
+    <h2 class="sec-t reveal">Up in 3 steps</h2>
+    <p class="sec-s reveal">Everything runs locally on Windows. No cloud account required.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-c">
+          <h4>Download the release</h4>
+          <p>Grab the <code>.zip</code> from the download section below. Also grab the <code>.vsix</code> if you use VS
+            Code for syntax highlighting.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-c">
+          <h4>Extract to a permanent folder</h4>
+          <p>Unzip to a fixed location like <code>C:\Mint\</code>. The folder contains <code>mint.exe</code>, helper
+            scripts, and the <code>plugins\</code> directory.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-c">
+          <h4>Run setup.bat as Administrator</h4>
+          <p>Right-click <code>setup.bat</code> &rarr; <em>Run as administrator</em>. It installs Python dependencies
+            via <code>mod.bat</code>, registers <code>.mint</code> files in the Windows registry, and launches Mint.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-const aiInput = document.getElementById('ai-input');
-const aiMessages = document.getElementById('ai-messages');
-const aiWindow = document.getElementById('ai-window');
+  <!-- DOWNLOAD -->
+  <section class="dl-sec" id="download">
+    <div class="sec-ey reveal">Download</div>
+    <h2 class="sec-t reveal">Get Mint</h2>
+    <p class="sec-s reveal">Pre-built for Windows (AMD64). Source available on GitHub for all platforms.</p>
+    <div class="dl-grid">
+      <div class="dl-card">
+        <div class="dl-badge new">&#9679;&nbsp; Latest</div>
+        <h3>Build 1.4.1</h3>
+        <div class="dl-ver">2026 &nbsp;&middot;&nbsp; C build</div>
+        <a href="https://github.com/fruzino/Mint/releases/tag/v1.4.1" class="dl-btn pri">&#8659;&nbsp; Download for
+          Windows (AMD)</a>
+        <a href="https://github.com/fruzino/Mint/releases" class="dl-btn gh">View all versions</a>
+        <p class="dl-note"><a href="https://github.com/limesuggestbox360-art/Mint">Read the manual (recommended)</a></p>
+      </div>
+      <div class="dl-card">
+        <div class="dl-badge old">&#9679;&nbsp; Legacy</div>
+        <h3>Build 1.0.2</h3>
+        <div class="dl-ver">Original Python build</div>
+        <a href="https://github.com/limesuggestbox360-art/Mint/releases/tag/v1" class="dl-btn gh">&#8659;&nbsp; Download
+          Legacy</a>
+        <a href="https://github.com/limesuggestbox360-art/Mint/releases" class="dl-btn gh">View all versions</a>
+        <p class="dl-note"><a href="https://github.com/limesuggestbox360-art/Mint">Read the manual</a></p>
+      </div>
+    </div>
+  </section>
 
-function toggleChat() {
-    aiWindow.classList.toggle('active');
-}
+  <!-- AI CHAT -->
+  <div id="aic">
+    <button id="ait">&#10024;</button>
+    <div id="aiw">
+      <div class="aih">
+        <div class="aih-t">
+          <div class="aih-dot"></div>Mint AI Helper
+        </div>
+        <button class="aih-x" onclick="tc()">&#x2715;</button>
+      </div>
+      <div id="aim">
+        <div class="ab bot">Hi! Ask me anything about <b>Mint</b> syntax, setup, or commands.</div>
+      </div>
+      <div class="aif">
+        <input type="text" id="aii" placeholder="How do I use mod.bat?">
+        <button class="ais" onclick="sa()">&#10148;</button>
+      </div>
+    </div>
+  </div>
 
-document.getElementById('ai-toggle').addEventListener('click', toggleChat);
+  <section class="donate-sec" id="donate">
+    <div class="sec-ey reveal">Support</div>
+    <h2 class="sec-t reveal">Support Mint Development</h2>
+    <p class="sec-s reveal">
+      Mint is completely free and open-source. Donations help fund development,
+      documentation, and new features.
+    </p>
 
-function appendMessage(sender, text) {
-    const msgDiv = document.createElement('div');
-    msgDiv.style.background = sender === 'User' ? '#444' : '#333';
-    msgDiv.style.padding = '10px';
-    msgDiv.style.borderRadius = '5px';
-    msgDiv.style.whiteSpace = 'pre-wrap'; 
+    <div class="donate-grid">
 
-    let formattedText = text
-        .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>') 
-        .replace(/### (.*?)\n/g, '<h4 style="margin:5px 0; color:#7baf62;">$1</h4>');
+      <div class="donate-card">
+        <h3>International Support</h3>
+        <p>If you're outside India, you can donate via PayPal.</p>
 
-    msgDiv.innerHTML = `<b>${sender}:</b><br>${formattedText}`;
-    aiMessages.appendChild(msgDiv);
-    aiMessages.scrollTop = aiMessages.scrollHeight;
-}
+        <form action="https://www.paypal.com/donate" method="post" target="_top">
+          <input type="hidden" name="business" value="YOUR_PAYPAL_EMAIL">
+          <input type="hidden" name="currency_code" value="USD">
+          <button class="btn-s">Donate with PayPal</button>
+        </form>
+      </div>
 
-const MINT_KNOWLEDGE = "You are the Mint AI Helper. Language: Mint is open-source. Setup: Install zip and 1.3.0 .vsix. Run mod.bat and setup.bat as Admin.";
+    </div>
+  </section>
 
-async function askAI() {
-    const userInput = aiInput.value.trim();
-    if (!userInput) return;
+  <footer>
+    <span>&copy; 2026 Fruzio Open Source &nbsp;&middot;&nbsp; Mint is free and open-source</span>
+    <div class="footer-links">
+      <a href="commands.html">Commands</a>
+      <a href="devapi.html">Dev API</a>
+      <a href="https://github.com/fruzino/Mint">GitHub</a>
+    </div>
+  </footer>
 
-    appendMessage('User', userInput);
-    aiInput.value = '';
-
-    const loadingDiv = document.createElement('div');
-    loadingDiv.innerText = "Mint AI is thinking...";
-    aiMessages.appendChild(loadingDiv);
-
-    try {
-        const myPass = localStorage.getItem("admin_pass") || ""; 
-
-        const response = await fetch('http://localhost:3000/api/generate', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'x-bypass-code': myPass 
-            },
-            body: JSON.stringify({ prompt: userInput }) 
-        });
-
-        const data = await response.json();
-        loadingDiv.remove();
-
-        if (data.error) {
-            const errorMsg = typeof data.error === 'object' ? JSON.stringify(data.error) : data.error;
-            appendMessage('System', `⚠️ ${errorMsg}`);
-            return;
+  <script>
+    /* ── PARTICLES ── */
+    (function () {
+      const c = document.getElementById('particles'), ctx = c.getContext('2d');
+      let W, H, pts = [];
+      function resize() { W = c.width = window.innerWidth; H = c.height = window.innerHeight }
+      resize(); window.addEventListener('resize', resize);
+      const N = 48;
+      for (let i = 0; i < N; i++)pts.push({
+        x: Math.random() * 1920, y: Math.random() * 1080,
+        vx: (Math.random() - .5) * .3, vy: (Math.random() - .5) * .3,
+        r: Math.random() * 1.4 + .4, o: Math.random() * .5 + .1
+      });
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        for (let i = 0; i < N; i++) {
+          const p = pts[i];
+          p.x += p.vx; p.y += p.vy;
+          if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+          if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(123,218,106,${p.o})`; ctx.fill();
         }
-        if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
-            const aiText = data.candidates[0].content.parts[0].text;
-            appendMessage('Mint AI', aiText);
-        } else {
-            appendMessage('System', "Empty response. Check server logs.");
+        // lines between close points
+        for (let i = 0; i < N; i++)for (let j = i + 1; j < N; j++) {
+          const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y, d = Math.sqrt(dx * dx + dy * dy);
+          if (d < 120) {
+            ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y);
+            ctx.strokeStyle = `rgba(123,218,106,${.07 * (1 - d / 120)})`; ctx.lineWidth = .6; ctx.stroke();
+          }
         }
-    } catch (error) {
-        if (loadingDiv) loadingDiv.remove();
-        appendMessage('System', `Connection Error: ${error.message}`);
-    }
-}
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
 
-// Unified Search Logic with Highlighting
-const searchInput = document.querySelector('.search-input');
-searchInput.addEventListener('input', () => {
-    const query = searchInput.value.toLowerCase();
-    const items = document.querySelectorAll('.grid-item, .hero-info p, .download-box');
-    
-    items.forEach(el => {
-        // Store original HTML once
-        if (!el.dataset.original) el.dataset.original = el.innerHTML;
-        
-        if (query === "") {
-            el.innerHTML = el.dataset.original;
-            el.style.display = "";
-            return;
-        }
-
-        const text = el.innerText.toLowerCase();
-        if (text.includes(query)) {
-            el.style.display = "";
-            const regex = new RegExp(`(${query})`, 'gi');
-            el.innerHTML = el.dataset.original.replace(regex, '<mark>$1</mark>');
-        } else {
-            el.style.display = "none";
-        }
+    /* ── SCROLL PROGRESS ── */
+    const prog = document.getElementById('prog');
+    window.addEventListener('scroll', () => {
+      const pct = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+      prog.style.width = pct + '%';
     });
-});
-</script>
 
-<script>
-    function searchPage() {
-        const query = document.getElementById('searchInput').value.toLowerCase();
-        const items = document.querySelectorAll('.grid-item, .hero-info p, .download-box');
-        const notice = document.getElementById('noResults');
-        let found = false;
-
-        items.forEach(el => {
-            // 1. Remove previous highlights to prevent nesting <mark> tags
-            if (el.originalText === undefined) {
-                el.originalText = el.innerHTML; // Store the clean HTML first time
+    /* ── INTERSECTION OBSERVER — scroll reveals ── */
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('vis');
+        // stat counter
+        if (e.target.classList.contains('stat')) {
+          const raw = e.target.dataset.count;
+          const num = parseFloat(raw);
+          if (!isNaN(num)) {
+            const el = e.target.querySelector('.stat-n');
+            const suffix = raw.replace(/[0-9.]/g, '');
+            let start = 0, dur = 900, t0 = null;
+            function tick(ts) {
+              if (!t0) t0 = ts;
+              const p = Math.min((ts - t0) / dur, 1);
+              const ease = 1 - Math.pow(1 - p, 3);
+              el.textContent = Math.round(ease * num) + suffix;
+              if (p < 1) requestAnimationFrame(tick);
             }
-            el.innerHTML = el.originalText;
+            requestAnimationFrame(tick);
+          }
+        }
+        // sec-t underline
+        if (e.target.classList.contains('sec-t')) e.target.classList.add('vis');
+        io.unobserve(e.target);
+      });
+    }, { threshold: .15 });
 
-            if (query === "") {
-                el.style.display = "";
-                return;
-            }
+    document.querySelectorAll('.reveal,.stat,.stagger,.step,.dl-card,.sec-t').forEach(el => io.observe(el));
 
-            // 2. Search and Highlight
-            const content = el.innerHTML;
-            const regex = new RegExp(`(${query})`, 'gi');
-            
-            if (content.toLowerCase().includes(query)) {
-                el.innerHTML = content.replace(regex, '<mark>$1</mark>');
-                el.style.display = "";
-                found = true;
-            } else {
-                el.style.display = "none";
-            }
+    /* feature cards stagger as carousel scrolls into view */
+    const fcObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        document.querySelectorAll('.fc').forEach((fc, i) => {
+          setTimeout(() => fc.classList.add('vis'), i * 60);
         });
+        fcObs.disconnect();
+      });
+    }, { threshold: .1 });
+    fcObs.observe(document.getElementById('fs'));
 
-        notice.style.display = (found || query === "") ? "none" : "block";
+    /* ── RIPPLE on buttons ── */
+    document.querySelectorAll('.btn-p,.btn-s,.dl-btn').forEach(btn => {
+      btn.addEventListener('click', function (e) {
+        const r = document.createElement('span'); r.className = 'ripple';
+        const rect = this.getBoundingClientRect();
+        const sz = Math.max(rect.width, rect.height);
+        r.style.cssText = `width:${sz}px;height:${sz}px;left:${e.clientX - rect.left - sz / 2}px;top:${e.clientY - rect.top - sz / 2}px`;
+        this.appendChild(r); setTimeout(() => r.remove(), 600);
+      });
+    });
+
+    /* ── TYPEWRITER on hero h1 ── */
+    (function () {
+      const h1 = document.querySelector('.hero-left h1');
+      const original = h1.innerHTML;
+      // only run once fonts loaded
+      document.fonts.ready.then(() => {
+        h1.innerHTML = ''; h1.style.opacity = '1';
+        const txt = 'Scripting that\nfeels ';
+        const emTxt = 'natural';
+        let i = 0;
+        const plain = document.createTextNode('');
+        h1.appendChild(plain);
+        function typeNext() {
+          if (i < txt.length) {
+            if (txt[i] === '\n') plain.textContent += '\n';
+            else plain.textContent += txt[i];
+            i++; setTimeout(typeNext, 38);
+          } else {
+            const em = document.createElement('em'); em.style.opacity = '0'; em.style.transition = 'opacity .4s';
+            h1.appendChild(em);
+            let j = 0;
+            setTimeout(() => {
+              em.style.opacity = '1';
+              function typeEm() {
+                if (j < emTxt.length) { em.textContent += emTxt[j++]; setTimeout(typeEm, 60); }
+              }
+              typeEm();
+            }, 80);
+          }
+        }
+        setTimeout(typeNext, 400);
+      });
+    })();
+
+    /* ── AI CHAT ── */
+    function tc() { document.getElementById('aiw').classList.toggle('on') }
+    document.getElementById('ait').addEventListener('click', tc);
+    document.getElementById('aii').addEventListener('keydown', e => { if (e.key === 'Enter') sa() });
+    function am(w, t) {
+      const d = document.createElement('div'); d.className = 'ab ' + (w === 'usr' ? 'usr' : 'bot');
+      d.style.cssText = 'opacity:0;transform:translateY(8px);transition:opacity .25s,transform .25s';
+      d.innerHTML = t.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/`(.*?)`/g, '<code style="font-family:JetBrains Mono,monospace;font-size:11px;color:#ce9178">$1</code>');
+      document.getElementById('aim').appendChild(d);
+      requestAnimationFrame(() => { d.style.opacity = '1'; d.style.transform = 'translateY(0)' });
+      document.getElementById('aim').scrollTop = 99999;
     }
-</script>
+    async function sa() {
+      const inp = document.getElementById('aii'), v = inp.value.trim(); if (!v) return;
+      am('usr', v); inp.value = '';
+      const ld = document.createElement('div'); ld.className = 'ab bot';
+      ld.innerHTML = '<span class="typing-dots"><span></span><span></span><span></span></span>';
+      document.getElementById('aim').appendChild(ld);
+      try {
+        const r = await fetch('http://localhost:3000/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-bypass-code': localStorage.getItem('admin_pass') || '' }, body: JSON.stringify({ prompt: v }) });
+        const data = await r.json(); ld.remove();
+        if (data.candidates && data.candidates[0].content.parts[0].text) am('bot', data.candidates[0].content.parts[0].text);
+        else am('bot', data.error ? '⚠ ' + data.error : 'Empty response.');
+      } catch (e) { ld.remove(); am('bot', '⚠ Connection error: ' + e.message) }
+    }
 
+    /* ── CAROUSEL ── */
+    const fs = document.getElementById('fs');
+    const STEP = 280;
+    document.getElementById('sl').addEventListener('click', () => fs.scrollBy({ left: -STEP, behavior: 'smooth' }));
+    document.getElementById('sr').addEventListener('click', () => fs.scrollBy({ left: STEP, behavior: 'smooth' }));
+
+    /* ── SEARCH ── */
+    document.querySelector('.search-input').addEventListener('input', function () {
+      const q = this.value.toLowerCase();
+      document.querySelectorAll('.fc,.dl-card,.ql,.step-c').forEach(el => {
+        if (!el._o) el._o = el.innerHTML;
+        if (!q) { el.innerHTML = el._o; el.style.opacity = ''; return }
+        const has = el.innerText.toLowerCase().includes(q);
+        el.style.opacity = has ? '' : '.18';
+        if (has) { const rx = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi'); el.innerHTML = el._o.replace(rx, '<mark>$1</mark>') }
+        else el.innerHTML = el._o;
+      });
+    });
+  </script>
+
+  <style>
+    /* typing dots for AI */
+    .typing-dots {
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+      height: 16px
+    }
+
+    .typing-dots span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--g);
+      opacity: .3;
+      animation: tdot 1.2s ease-in-out infinite
+    }
+
+    .typing-dots span:nth-child(2) {
+      animation-delay: .2s
+    }
+
+    .typing-dots span:nth-child(3) {
+      animation-delay: .4s
+    }
+
+    @keyframes tdot {
+
+      0%,
+      80%,
+      100% {
+        opacity: .3;
+        transform: scale(1)
+      }
+
+      40% {
+        opacity: 1;
+        transform: scale(1.3)
+      }
+    }
+  </style>
 </body>
+
 </html>
