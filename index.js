@@ -73,6 +73,11 @@ app.post('/api/generate', async (req, res) => {
     }
 });
 
+// Add a root route for testing if something may go wrong lol 
+app.get('/', (req, res) => {
+    res.send('Mint API is online and running on Vercel hosting site :)');
+});
+
 app.listen(PORT, () => {
     console.log(`Mint Server Secure: http://localhost:${PORT}`);
 });
