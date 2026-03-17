@@ -76,10 +76,14 @@ app.post('/api/generate', async (req, res) => {
 
 const path = require('path');
 
-// go to index.html yay
+
+app.use(express.static(__dirname));
+
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
+
 app.listen(PORT, () => {
     console.log(`Mint Server Secure: http://localhost:${PORT}`);
 });
