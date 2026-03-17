@@ -2,32 +2,42 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const fs = require('fs');
-
+const path = require('path');
 
 dotenv.config({ path: './key.env' });
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 
-const usageData = {}; 
 
+app.use(express.static(__dirname, { 
+    extensions: ['html', 'htm'] 
+}));
+
+const usageData = {}; 
 const API_KEY = process.env.GEMINI_KEY;
 const BYPASS_PASSWORD = process.env.MY_PRIVATE_BYPASS; 
 
+// --- ROUTES ---
+
+// Root Route
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Gemini AI API Route
 app.post('/api/generate', async (req, res) => {
     const userIP = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     const clientProvidedPass = req.headers['x-bypass-code']; 
     
     const now = Date.now();
-    const ONE_HOUR = 60 * 60 * 1000; // 1 hour in ms
+    const ONE_HOUR = 60 * 60 * 1000;
 
-    // 1. Define isOwner first
     const isOwner = (clientProvidedPass === BYPASS_PASSWORD && BYPASS_PASSWORD !== undefined);
 
-    // 2. Perform the rate limit check
     if (!isOwner && usageData[userIP]) {
         const timePassed = now - usageData[userIP];
         if (timePassed < ONE_HOUR) {
@@ -44,7 +54,7 @@ app.post('/api/generate', async (req, res) => {
         const readme = fs.existsSync('./README.md') ? fs.readFileSync('./README.md', 'utf8') : "";
 
         const model = "gemini-3.1-flash-lite-preview";
-        const endpoint = "v1beta"
+        const endpoint = "v1beta";
         const URL = `https://generativelanguage.googleapis.com/${endpoint}/models/${model}:generateContent?key=${API_KEY}`;
 
         const response = await fetch(URL, {
@@ -74,16 +84,6 @@ app.post('/api/generate', async (req, res) => {
     }
 });
 
-const path = require('path');
-
-
-app.use(express.static(__dirname));
-
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
 app.listen(PORT, () => {
-    console.log(`Mint Server Secure: http://localhost:${PORT}`);
+    console.log(`Mint Server Active: http://localhost:${PORT}`);
 });
