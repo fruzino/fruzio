@@ -3,7 +3,6 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const fs = require('fs');
 
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 dotenv.config({ path: './key.env' });
 const app = express();
