@@ -5,9 +5,12 @@ const fs = require('fs');
 
 
 dotenv.config({ path: './key.env' });
+const path = require('path');
+
 const app = express();
 const PORT = 3000;
 
+app.use(express.static(path.join(__dirname)));
 app.use(cors());
 app.use(express.json());
 
